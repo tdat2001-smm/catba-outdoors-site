@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tour Detail | Cat Ba Outdoors</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <nav class="nav" id="mainNav">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">Cat Ba <span>Outdoors</span></a>
+      <ul class="nav-links">
+        <li><a href="tours.html" class="nav-link active">Adventure</a></li>
+        <li><a href="stays.html" class="nav-link">Uncommon Stay</a></li>
+        <li><a href="services.html" class="nav-link">Services</a></li>
+        <li class="nav-dropdown">
+          <a href="about.html" class="nav-link">Essential</a>
+          <ul class="nav-dropdown-menu">
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="faq.html">FAQs</a></li>
+            <li><a href="blog.html">Blog</a></li>
+          </ul>
+        </li>
+        <li><a href="contact.html" class="nav-link">Contact</a></li>
+      </ul>
+      <button class="nav-toggle" aria-label="Menu"><span></span></button>
+    </div>
+  </nav>
+
+  <div class="page-header" style="padding-bottom:2rem;">
+    <div class="container">
+      <p style="opacity:0.6;margin-bottom:0.5rem;"><a href="tours.html" style="color:var(--color-accent-light);">&larr; All Adventures</a></p>
+      <h1 id="tourTitle">Loading...</h1>
+      <p id="tourSubtitle"></p>
+    </div>
+  </div>
+
+  <section class="section" id="tourContent">
+    <div class="container">
+      <div class="tour-detail-header">
+        <!-- Left: Tour info -->
+        <div>
+          <!-- Gallery placeholder -->
+          <div class="tour-gallery fade-in">
+            <div class="tour-gallery-main img-placeholder">Tour Photo</div>
+          </div>
+
+          <!-- Info bar -->
+          <div class="tour-info-bar">
+            <div class="tour-info-item">
+              <strong>Duration:</strong>
+              <span id="tourDuration">—</span>
+            </div>
+            <div class="tour-info-item">
+              <strong>Location:</strong>
+              <span id="tourLocation">—</span>
+            </div>
+            <div class="tour-info-item">
+              <span id="tourMaxGuests">—</span>
+            </div>
+            <div class="tour-info-item">
+              <strong>Languages:</strong>
+              <span id="tourLanguages">—</span>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="fade-in" id="tourDesc" style="margin-bottom:2rem;">
+            <p>Loading tour details...</p>
+          </div>
+
+          <!-- Highlights -->
+          <div class="fade-in" style="margin-bottom:2rem;">
+            <h3 style="margin-bottom:1rem;">Highlights</h3>
+            <ul id="tourHighlights" style="list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
+            </ul>
+          </div>
+
+          <!-- Itinerary -->
+          <div class="fade-in" style="margin-bottom:2rem;">
+            <h3 style="margin-bottom:1rem;">Itinerary</h3>
+            <div id="tourItinerary"></div>
+          </div>
+
+          <!-- Includes / Excludes -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:2rem;" class="fade-in">
+            <div>
+              <h4 style="margin-bottom:0.75rem;color:var(--color-primary);">Included</h4>
+              <ul id="tourIncludes" style="list-style:none;font-size:0.9rem;color:var(--color-gray-600);line-height:2;"></ul>
+            </div>
+            <div>
+              <h4 style="margin-bottom:0.75rem;color:#c0392b;">Not Included</h4>
+              <ul id="tourExcludes" style="list-style:none;font-size:0.9rem;color:var(--color-gray-600);line-height:2;"></ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Booking card -->
+        <div>
+          <div class="booking-card">
+            <h3>Book This Tour</h3>
+            <div class="booking-price-display" id="tourPrice">—</div>
+            <div class="text-muted text-sm mb-3" id="tourPriceVND"></div>
+
+            <form id="bookingForm">
+              <input type="hidden" name="tour" id="bookingTourName" value="">
+              <div class="form-group">
+                <label class="form-label">Full Name *</label>
+                <input type="text" name="name" class="form-input" required placeholder="Your name">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Email *</label>
+                <input type="email" name="email" class="form-input" required placeholder="your@email.com">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Phone / WhatsApp</label>
+                <input type="tel" name="phone" class="form-input" placeholder="+84...">
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Date *</label>
+                  <input type="date" name="date" class="form-input" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Guests *</label>
+                  <select name="guests" class="form-select" required>
+                    <option value="1">1 person</option>
+                    <option value="2" selected>2 people</option>
+                    <option value="3">3 people</option>
+                    <option value="4">4 people</option>
+                    <option value="5">5 people</option>
+                    <option value="6-10">6-10 people</option>
+                    <option value="10+">10+ people</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Message</label>
+                <textarea name="message" class="form-textarea" rows="3" placeholder="Special requests, dietary needs, etc."></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary btn-lg" style="width:100%;justify-content:center;">Send Booking Request</button>
+              <p class="text-muted text-sm text-center mt-2">Free cancellation up to 24h before</p>
+            </form>
+
+            <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--color-gray-200);text-align:center;">
+              <p class="text-sm text-muted mb-1">Prefer to chat?</p>
+              <div style="display:flex;gap:0.75rem;justify-content:center;">
+                <a href="https://zalo.me/0327012901" class="btn btn-sm" style="background:#0068ff;color:#fff;" target="_blank">Zalo</a>
+                <a href="https://wa.me/84327012901" class="btn btn-sm" style="background:#25d366;color:#fff;" target="_blank">WhatsApp</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-brand">Cat Ba Outdoors</div>
+          <p class="footer-desc">A hospitality and lifestyle ecosystem rooted in Cat Ba Island.</p>
+        </div>
+        <div>
+          <h4>Adventure</h4>
+          <ul class="footer-links">
+            <li><a href="tours.html">All Tours</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Stay</h4>
+          <ul class="footer-links">
+            <li><a href="stays.html#healing-camp">The Healing Camp</a></li>
+            <li><a href="stays.html#floating-homestay">Floating Homestay</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Contact</h4>
+          <ul class="footer-links">
+            <li><a href="tel:+84327012901">+84 327 012 901</a></li>
+            <li><a href="mailto:info@catbaoutdoors.vn">info@catbaoutdoors.vn</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; 2026 Cat Ba Outdoors. All rights reserved.</span>
+        <span><a href="#">Privacy Policy</a></span>
+      </div>
+    </div>
+  </footer>
+
+  <div class="float-buttons">
+    <a href="https://zalo.me/0327012901" class="float-btn float-btn-zalo" target="_blank" aria-label="Zalo">Z</a>
+    <a href="https://wa.me/84327012901" class="float-btn float-btn-whatsapp" target="_blank" aria-label="WhatsApp">W</a>
+  </div>
+
+  <script src="js/main.js"></script>
+  <script>loadTourDetail();</script>
+</body>
+</html>

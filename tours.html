@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Adventures & Tours | Cat Ba Outdoors</title>
+  <meta name="description" content="Explore outdoor adventures on Cat Ba Island and Lan Ha Bay — kayaking, cruises, rock climbing, paddleboarding, and more.">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav" id="mainNav">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">Cat Ba <span>Outdoors</span></a>
+      <ul class="nav-links">
+        <li class="nav-dropdown">
+          <a href="tours.html" class="nav-link active">Adventure</a>
+          <ul class="nav-dropdown-menu">
+            <li><a href="tours.html">All Tours</a></li>
+            <li><a href="tours.html#kayaking">Kayaking</a></li>
+            <li><a href="tours.html#cruises">Day Cruises</a></li>
+            <li><a href="tours.html#climbing">Rock Climbing</a></li>
+          </ul>
+        </li>
+        <li class="nav-dropdown">
+          <a href="stays.html" class="nav-link">Uncommon Stay</a>
+          <ul class="nav-dropdown-menu">
+            <li><a href="stays.html#healing-camp">The Healing Camp</a></li>
+            <li><a href="stays.html#floating-homestay">Lan Ha Floating Homestay</a></li>
+          </ul>
+        </li>
+        <li class="nav-dropdown">
+          <a href="services.html" class="nav-link">Services</a>
+          <ul class="nav-dropdown-menu">
+            <li><a href="services.html#transport">Transport</a></li>
+            <li><a href="services.html#workshop">Workshop</a></li>
+            <li><a href="services.html#rental">Rental</a></li>
+          </ul>
+        </li>
+        <li class="nav-dropdown">
+          <a href="about.html" class="nav-link">Essential</a>
+          <ul class="nav-dropdown-menu">
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="faq.html">FAQs</a></li>
+            <li><a href="blog.html">Blog / Guideline</a></li>
+          </ul>
+        </li>
+        <li><a href="contact.html" class="nav-link">Contact</a></li>
+      </ul>
+      <button class="nav-toggle" aria-label="Menu"><span></span></button>
+    </div>
+  </nav>
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="container">
+      <h1>Adventures</h1>
+      <p>Curated outdoor experiences on Cat Ba Island and Lan Ha Bay</p>
+    </div>
+  </div>
+
+  <!-- Tours Grid -->
+  <section class="section">
+    <div class="container">
+      <!-- Filter bar -->
+      <div style="display:flex;gap:0.75rem;margin-bottom:2.5rem;flex-wrap:wrap;">
+        <button class="btn btn-sm btn-dark tour-filter active" data-filter="all">All</button>
+        <button class="btn btn-sm btn-outline tour-filter" style="border-color:var(--color-gray-200);color:var(--color-gray-800);" data-filter="adventure">Adventure</button>
+        <button class="btn btn-sm btn-outline tour-filter" style="border-color:var(--color-gray-200);color:var(--color-gray-800);" data-filter="experience">Experience</button>
+      </div>
+
+      <div class="grid grid-3" id="allTours">
+        <!-- Loaded via JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-banner">
+    <div class="container">
+      <h2>Can't find what you're looking for?</h2>
+      <p>We craft custom experiences. Tell us what you'd love to do.</p>
+      <a href="contact.html" class="btn btn-primary btn-lg">Get in Touch</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-brand">Cat Ba Outdoors</div>
+          <p class="footer-desc">A hospitality and lifestyle ecosystem rooted in Cat Ba Island.</p>
+          <ul class="footer-social">
+            <li><a href="#" aria-label="Facebook">f</a></li>
+            <li><a href="#" aria-label="Instagram">ig</a></li>
+            <li><a href="#" aria-label="TikTok">tk</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Adventure</h4>
+          <ul class="footer-links">
+            <li><a href="tours.html">All Tours</a></li>
+            <li><a href="tours.html#kayaking">Kayaking</a></li>
+            <li><a href="tours.html#cruises">Day Cruises</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Stay</h4>
+          <ul class="footer-links">
+            <li><a href="stays.html#healing-camp">The Healing Camp</a></li>
+            <li><a href="stays.html#floating-homestay">Floating Homestay</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Contact</h4>
+          <ul class="footer-links">
+            <li><a href="tel:+84327012901">+84 327 012 901</a></li>
+            <li><a href="mailto:info@catbaoutdoors.vn">info@catbaoutdoors.vn</a></li>
+            <li><a href="contact.html">184 Duong 1/4, Cat Ba</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; 2026 Cat Ba Outdoors. All rights reserved.</span>
+        <span><a href="#">Privacy Policy</a></span>
+      </div>
+    </div>
+  </footer>
+
+  <div class="float-buttons">
+    <a href="https://zalo.me/0327012901" class="float-btn float-btn-zalo" target="_blank" aria-label="Zalo">Z</a>
+    <a href="https://wa.me/84327012901" class="float-btn float-btn-whatsapp" target="_blank" aria-label="WhatsApp">W</a>
+  </div>
+
+  <script src="js/main.js"></script>
+  <script>
+    loadTours('allTours');
+
+    // Filter buttons
+    document.querySelectorAll('.tour-filter').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tour-filter').forEach(b => {
+          b.classList.remove('active');
+          b.classList.remove('btn-dark');
+          b.style.borderColor = 'var(--color-gray-200)';
+          b.style.color = 'var(--color-gray-800)';
+          b.style.background = 'transparent';
+        });
+        btn.classList.add('active', 'btn-dark');
+        btn.style.borderColor = '';
+        btn.style.color = '';
+        btn.style.background = '';
+
+        const filter = btn.dataset.filter;
+        if (filter === 'all') {
+          loadTours('allTours');
+        } else {
+          loadTours('allTours', { category: filter });
+        }
+      });
+    });
+  </script>
+</body>
+</html>

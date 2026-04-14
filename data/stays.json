@@ -1,0 +1,26 @@
+[
+  {
+    "id": "the-healing-camp",
+    "title": "The Healing Camp",
+    "subtitle": "Seaside camping & mindful dining",
+    "description": "A seaside camp where nature sets the rhythm. Wake to ocean sounds, dine on mindful meals, and let the island pace slow you down. The Healing Camp is not a resort — it's a place to rest, reconnect, and breathe.",
+    "location": "Cat Ba Island",
+    "priceFrom": 500000,
+    "currency": "VND",
+    "image": "img/stay-healing-camp.jpg",
+    "features": ["Seaside camping", "Mindful dining", "Wellness activities", "Ocean views", "Bar & lounge"],
+    "link": "https://thehealingcamp.vn"
+  },
+  {
+    "id": "lan-ha-floating-homestay",
+    "title": "Lan Ha Floating Homestay",
+    "subtitle": "Sleep on the bay",
+    "description": "An uncommon stay on the water. Our floating homestay sits quietly in Lan Ha Bay — surrounded by karst mountains, far from noise, close to everything that matters. Fish, kayak, cook, rest.",
+    "location": "Lan Ha Bay",
+    "priceFrom": 800000,
+    "currency": "VND",
+    "image": "img/stay-floating-homestay.jpg",
+    "features": ["Floating house", "Kayaking", "Fishing", "Fresh seafood meals", "Stargazing"],
+    "link": "#"
+  }
+]
