@@ -5,12 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tour Detail | Cat Ba Outdoors</title>
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/tour-detail.css">
 </head>
 <body>
 
   <nav class="nav" id="mainNav">
     <div class="nav-inner">
-      <a href="/" class="nav-logo">Cat Ba <span>Outdoors</span></a>
+      <a href="/" class="nav-logo"><img src="img/logo.jpg" alt="Cat Ba Outdoors"><div class="nav-logo-text">Catba Outdoors<span>Off the beaten path</span></div></a>
       <ul class="nav-links">
         <li><a href="tours.html" class="nav-link active">Adventure</a></li>
         <li><a href="stays.html" class="nav-link">Uncommon Stay</a></li>
@@ -29,131 +30,361 @@
     </div>
   </nav>
 
-  <div class="page-header" style="padding-bottom:2rem;">
+  <!-- Breadcrumb -->
+  <div class="td-breadcrumb">
     <div class="container">
-      <p style="opacity:0.6;margin-bottom:0.5rem;"><a href="tours.html" style="color:var(--color-accent-light);">&larr; All Adventures</a></p>
-      <h1 id="tourTitle">Loading...</h1>
-      <p id="tourSubtitle"></p>
+      <a href="/">Home</a>
+      <span class="td-breadcrumb-sep">/</span>
+      <a href="tours.html">Adventures</a>
+      <span class="td-breadcrumb-sep">/</span>
+      <span id="breadcrumbTitle">Tour Detail</span>
     </div>
   </div>
 
-  <section class="section" id="tourContent">
+  <!-- Gallery -->
+  <section class="td-gallery-section">
     <div class="container">
-      <div class="tour-detail-header">
-        <!-- Left: Tour info -->
-        <div>
-          <!-- Gallery placeholder -->
-          <div class="tour-gallery fade-in">
-            <div class="tour-gallery-main img-placeholder">Tour Photo</div>
-          </div>
+      <div class="td-gallery">
+        <div class="td-gallery-main img-placeholder" id="galleryMain">
+          Tour Photo
+        </div>
+        <div class="td-gallery-thumbs">
+          <div class="td-thumb img-placeholder active">Photo 1</div>
+          <div class="td-thumb img-placeholder">Photo 2</div>
+          <div class="td-thumb img-placeholder">Photo 3</div>
+          <div class="td-thumb img-placeholder">Photo 4</div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-          <!-- Info bar -->
-          <div class="tour-info-bar">
-            <div class="tour-info-item">
-              <strong>Duration:</strong>
-              <span id="tourDuration">—</span>
-            </div>
-            <div class="tour-info-item">
-              <strong>Location:</strong>
-              <span id="tourLocation">—</span>
-            </div>
-            <div class="tour-info-item">
-              <span id="tourMaxGuests">—</span>
-            </div>
-            <div class="tour-info-item">
-              <strong>Languages:</strong>
-              <span id="tourLanguages">—</span>
-            </div>
+  <!-- Tour Title & Description -->
+  <section class="td-main">
+    <div class="container">
+
+      <!-- Title area -->
+      <div class="td-title-area">
+        <div class="td-title-left">
+          <div class="td-badges">
+            <span class="td-badge" id="tourCategoryBadge">Adventure</span>
+            <span class="td-badge td-badge-lang" id="tourLangBadge">English</span>
           </div>
+          <h1 class="td-title" id="tourTitle" data-tour-title="">Loading...</h1>
+          <p class="td-subtitle" id="tourSubtitle"></p>
+          <div class="td-location">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span id="tourLocation">Cat Ba Island</span>
+          </div>
+        </div>
+        <div class="td-title-right">
+          <div class="td-price-block">
+            <span class="td-price-label">From</span>
+            <span class="td-price" id="tourPrice">$45</span>
+            <span class="td-price-unit">/ person</span>
+          </div>
+          <div class="td-price-vnd" id="tourPriceVND">~ 1,100,000 VND</div>
+        </div>
+      </div>
+
+      <!-- Specs Grid (Turmet style) -->
+      <div class="td-specs-grid">
+        <div class="td-spec-card">
+          <div class="td-spec-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div class="td-spec-label">Duration</div>
+          <div class="td-spec-value" id="tourDuration">Full day</div>
+        </div>
+        <div class="td-spec-card">
+          <div class="td-spec-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+          </div>
+          <div class="td-spec-label">Group Size</div>
+          <div class="td-spec-value" id="tourMaxGuests">Max 25</div>
+        </div>
+        <div class="td-spec-card">
+          <div class="td-spec-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <div class="td-spec-label">Location</div>
+          <div class="td-spec-value" id="tourLocationSpec">Lan Ha Bay</div>
+        </div>
+        <div class="td-spec-card">
+          <div class="td-spec-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+          </div>
+          <div class="td-spec-label">Languages</div>
+          <div class="td-spec-value" id="tourLanguages">English</div>
+        </div>
+        <div class="td-spec-card">
+          <div class="td-spec-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <div class="td-spec-label">Hotel Transfer</div>
+          <div class="td-spec-value">Included</div>
+        </div>
+        <div class="td-spec-card">
+          <div class="td-spec-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </div>
+          <div class="td-spec-label">Availability</div>
+          <div class="td-spec-value">Daily</div>
+        </div>
+        <div class="td-spec-card">
+          <div class="td-spec-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2"/><circle cx="8.5" cy="7" r="4"/></svg>
+          </div>
+          <div class="td-spec-label">Guide</div>
+          <div class="td-spec-value">Professional</div>
+        </div>
+        <div class="td-spec-card">
+          <div class="td-spec-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <div class="td-spec-label">Cancellation</div>
+          <div class="td-spec-value">Free 24h</div>
+        </div>
+      </div>
+
+      <!-- Two column: Content + Booking -->
+      <div class="td-content-grid">
+
+        <!-- Left: Content -->
+        <div class="td-content-left">
 
           <!-- Description -->
-          <div class="fade-in" id="tourDesc" style="margin-bottom:2rem;">
+          <div class="td-section" id="tourDesc">
+            <h2 class="td-section-title">About This Tour</h2>
             <p>Loading tour details...</p>
           </div>
 
           <!-- Highlights -->
-          <div class="fade-in" style="margin-bottom:2rem;">
-            <h3 style="margin-bottom:1rem;">Highlights</h3>
-            <ul id="tourHighlights" style="list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
-            </ul>
+          <div class="td-section">
+            <h2 class="td-section-title">Highlights</h2>
+            <ul class="td-highlights" id="tourHighlights"></ul>
           </div>
 
-          <!-- Itinerary -->
-          <div class="fade-in" style="margin-bottom:2rem;">
-            <h3 style="margin-bottom:1rem;">Itinerary</h3>
-            <div id="tourItinerary"></div>
+          <!-- Itinerary (Accordion) -->
+          <div class="td-section">
+            <h2 class="td-section-title">Tour Plan</h2>
+            <div class="td-itinerary" id="tourItinerary">
+              <!-- Loaded via JS -->
+            </div>
           </div>
 
           <!-- Includes / Excludes -->
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:2rem;" class="fade-in">
-            <div>
-              <h4 style="margin-bottom:0.75rem;color:var(--color-primary);">Included</h4>
-              <ul id="tourIncludes" style="list-style:none;font-size:0.9rem;color:var(--color-gray-600);line-height:2;"></ul>
-            </div>
-            <div>
-              <h4 style="margin-bottom:0.75rem;color:#c0392b;">Not Included</h4>
-              <ul id="tourExcludes" style="list-style:none;font-size:0.9rem;color:var(--color-gray-600);line-height:2;"></ul>
+          <div class="td-section">
+            <div class="td-inc-exc">
+              <div class="td-inc">
+                <h3 class="td-inc-title td-inc-title-yes">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#27ae60" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  What's Included
+                </h3>
+                <ul id="tourIncludes" class="td-inc-list"></ul>
+              </div>
+              <div class="td-exc">
+                <h3 class="td-inc-title td-inc-title-no">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#e74c3c" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  What's Not Included
+                </h3>
+                <ul id="tourExcludes" class="td-inc-list"></ul>
+              </div>
             </div>
           </div>
+
+          <!-- Map -->
+          <div class="td-section">
+            <h2 class="td-section-title">Location</h2>
+            <div class="td-map">
+              <iframe
+                src="https://maps.google.com/maps?q=Cat+Ba+Island+Vietnam&t=m&z=12&output=embed"
+                title="Tour Location"
+                style="width:100%;height:100%;border:0;"
+                loading="lazy"
+                allowfullscreen>
+              </iframe>
+            </div>
+          </div>
+
+          <!-- Reviews -->
+          <div class="td-section">
+            <h2 class="td-section-title">Reviews</h2>
+            <div class="td-reviews-summary">
+              <div class="td-review-score">
+                <span class="td-score-number">4.9</span>
+                <div class="td-score-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                <span class="td-score-count">Based on 120+ reviews</span>
+              </div>
+              <div class="td-review-bars">
+                <div class="td-bar-row"><span>Services</span><div class="td-bar"><div class="td-bar-fill" style="width:96%"></div></div><span>4.8</span></div>
+                <div class="td-bar-row"><span>Safety</span><div class="td-bar"><div class="td-bar-fill" style="width:100%"></div></div><span>5.0</span></div>
+                <div class="td-bar-row"><span>Guide</span><div class="td-bar"><div class="td-bar-fill" style="width:98%"></div></div><span>4.9</span></div>
+                <div class="td-bar-row"><span>Food</span><div class="td-bar"><div class="td-bar-fill" style="width:92%"></div></div><span>4.6</span></div>
+                <div class="td-bar-row"><span>Value</span><div class="td-bar"><div class="td-bar-fill" style="width:94%"></div></div><span>4.7</span></div>
+              </div>
+            </div>
+
+            <!-- Sample reviews -->
+            <div class="td-review-list">
+              <div class="td-review">
+                <div class="td-review-avatar img-placeholder">JD</div>
+                <div class="td-review-body">
+                  <div class="td-review-header">
+                    <strong>John D.</strong>
+                    <span class="td-review-date">March 2026</span>
+                  </div>
+                  <div class="td-review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                  <p>Amazing experience! The crew was fantastic, the bay is breathtaking, and the kayaking through the karsts was unforgettable. Highly recommend!</p>
+                </div>
+              </div>
+              <div class="td-review">
+                <div class="td-review-avatar img-placeholder">SL</div>
+                <div class="td-review-body">
+                  <div class="td-review-header">
+                    <strong>Sarah L.</strong>
+                    <span class="td-review-date">February 2026</span>
+                  </div>
+                  <div class="td-review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                  <p>One of the best day trips we've ever done. The small group size made it feel personal. The lunch on the boat was delicious. Will come back!</p>
+                </div>
+              </div>
+              <div class="td-review">
+                <div class="td-review-avatar img-placeholder">MT</div>
+                <div class="td-review-body">
+                  <div class="td-review-header">
+                    <strong>Minh T.</strong>
+                    <span class="td-review-date">January 2026</span>
+                  </div>
+                  <div class="td-review-stars">&#9733;&#9733;&#9733;&#9733;&#9734;</div>
+                  <p>Great tour overall. Beautiful scenery and friendly guides. The floating village visit was a highlight. Only wish we had more time for swimming.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
 
-        <!-- Right: Booking card -->
-        <div>
-          <div class="booking-card">
-            <h3>Book This Tour</h3>
-            <div class="booking-price-display" id="tourPrice">—</div>
-            <div class="text-muted text-sm mb-3" id="tourPriceVND"></div>
+        <!-- Right: Booking Sidebar -->
+        <div class="td-content-right">
+          <div class="td-booking-card" id="bookingCard">
+            <div class="td-booking-header">
+              <h3>Book This Tour</h3>
+              <div class="td-booking-price">
+                <span class="td-bp-amount" id="bookingPrice">$45</span>
+                <span class="td-bp-unit">/ person</span>
+              </div>
+            </div>
 
             <form id="bookingForm">
               <input type="hidden" name="tour" id="bookingTourName" value="">
-              <div class="form-group">
-                <label class="form-label">Full Name *</label>
-                <input type="text" name="name" class="form-input" required placeholder="Your name">
+
+              <div class="td-bf-group">
+                <label class="td-bf-label">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                  Date
+                </label>
+                <input type="date" name="date" class="td-bf-input" required>
               </div>
-              <div class="form-group">
-                <label class="form-label">Email *</label>
-                <input type="email" name="email" class="form-input" required placeholder="your@email.com">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Phone / WhatsApp</label>
-                <input type="tel" name="phone" class="form-input" placeholder="+84...">
-              </div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label class="form-label">Date *</label>
-                  <input type="date" name="date" class="form-input" required>
+
+              <div class="td-bf-row">
+                <div class="td-bf-group">
+                  <label class="td-bf-label">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                    Adults
+                  </label>
+                  <div class="td-bf-counter">
+                    <button type="button" class="td-counter-btn" onclick="bookingCounter('b-adults',-1)">-</button>
+                    <span id="b-adults">2</span>
+                    <button type="button" class="td-counter-btn" onclick="bookingCounter('b-adults',1)">+</button>
+                  </div>
                 </div>
-                <div class="form-group">
-                  <label class="form-label">Guests *</label>
-                  <select name="guests" class="form-select" required>
-                    <option value="1">1 person</option>
-                    <option value="2" selected>2 people</option>
-                    <option value="3">3 people</option>
-                    <option value="4">4 people</option>
-                    <option value="5">5 people</option>
-                    <option value="6-10">6-10 people</option>
-                    <option value="10+">10+ people</option>
-                  </select>
+                <div class="td-bf-group">
+                  <label class="td-bf-label">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="7" r="4"/><path d="M5 21v-2a7 7 0 0114 0v2"/></svg>
+                    Children
+                  </label>
+                  <div class="td-bf-counter">
+                    <button type="button" class="td-counter-btn" onclick="bookingCounter('b-children',-1)">-</button>
+                    <span id="b-children">0</span>
+                    <button type="button" class="td-counter-btn" onclick="bookingCounter('b-children',1)">+</button>
+                  </div>
                 </div>
               </div>
-              <div class="form-group">
-                <label class="form-label">Message</label>
-                <textarea name="message" class="form-textarea" rows="3" placeholder="Special requests, dietary needs, etc."></textarea>
+
+              <div class="td-bf-group">
+                <label class="td-bf-label">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.79 19.79 0 012.12 4.11 2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+                  Full Name
+                </label>
+                <input type="text" name="name" class="td-bf-input" required placeholder="Your name">
               </div>
-              <button type="submit" class="btn btn-primary btn-lg" style="width:100%;justify-content:center;">Send Booking Request</button>
-              <p class="text-muted text-sm text-center mt-2">Free cancellation up to 24h before</p>
+
+              <div class="td-bf-group">
+                <label class="td-bf-label">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                  Email
+                </label>
+                <input type="email" name="email" class="td-bf-input" required placeholder="your@email.com">
+              </div>
+
+              <div class="td-bf-group">
+                <label class="td-bf-label">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                  Message (optional)
+                </label>
+                <textarea name="message" class="td-bf-input td-bf-textarea" rows="3" placeholder="Special requests..."></textarea>
+              </div>
+
+              <!-- Price summary -->
+              <div class="td-bf-summary">
+                <div class="td-bf-summary-row">
+                  <span>Adults (<span id="summary-adults">2</span> x <span id="summary-price">$45</span>)</span>
+                  <span id="summary-adults-total">$90</span>
+                </div>
+                <div class="td-bf-summary-row" id="summary-children-row" style="display:none;">
+                  <span>Children (<span id="summary-children">0</span> x <span id="summary-child-price">$25</span>)</span>
+                  <span id="summary-children-total">$0</span>
+                </div>
+                <div class="td-bf-summary-total">
+                  <span>Total</span>
+                  <span id="summary-total">$90</span>
+                </div>
+              </div>
+
+              <button type="submit" class="td-bf-submit">
+                Book Now
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              </button>
+
+              <p class="td-bf-note">Free cancellation up to 24 hours before</p>
             </form>
 
-            <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--color-gray-200);text-align:center;">
-              <p class="text-sm text-muted mb-1">Prefer to chat?</p>
-              <div style="display:flex;gap:0.75rem;justify-content:center;">
-                <a href="https://zalo.me/0327012901" class="btn btn-sm" style="background:#0068ff;color:#fff;" target="_blank">Zalo</a>
-                <a href="https://wa.me/84327012901" class="btn btn-sm" style="background:#25d366;color:#fff;" target="_blank">WhatsApp</a>
+            <!-- Contact options -->
+            <div class="td-bf-contact">
+              <p>Prefer to chat directly?</p>
+              <div class="td-bf-contact-btns">
+                <a href="https://zalo.me/0327012901" class="td-bf-zalo" target="_blank">
+                  <span>Z</span> Zalo
+                </a>
+                <a href="https://wa.me/84327012901" class="td-bf-whatsapp" target="_blank">
+                  <span>W</span> WhatsApp
+                </a>
               </div>
             </div>
           </div>
         </div>
       </div>
+    </div>
+  </section>
+
+  <!-- Related Tours -->
+  <section class="section bg-light">
+    <div class="container">
+      <div class="section-title">
+        <h2>You Might Also Like</h2>
+        <p>More adventures on Cat Ba Island</p>
+      </div>
+      <div class="grid grid-3" id="relatedTours"></div>
     </div>
   </section>
 
@@ -165,31 +396,11 @@
           <div class="footer-brand">Cat Ba Outdoors</div>
           <p class="footer-desc">A hospitality and lifestyle ecosystem rooted in Cat Ba Island.</p>
         </div>
-        <div>
-          <h4>Adventure</h4>
-          <ul class="footer-links">
-            <li><a href="tours.html">All Tours</a></li>
-          </ul>
-        </div>
-        <div>
-          <h4>Stay</h4>
-          <ul class="footer-links">
-            <li><a href="stays.html#healing-camp">The Healing Camp</a></li>
-            <li><a href="stays.html#floating-homestay">Floating Homestay</a></li>
-          </ul>
-        </div>
-        <div>
-          <h4>Contact</h4>
-          <ul class="footer-links">
-            <li><a href="tel:+84327012901">+84 327 012 901</a></li>
-            <li><a href="mailto:info@catbaoutdoors.vn">info@catbaoutdoors.vn</a></li>
-          </ul>
-        </div>
+        <div><h4>Adventure</h4><ul class="footer-links"><li><a href="tours.html">All Tours</a></li></ul></div>
+        <div><h4>Stay</h4><ul class="footer-links"><li><a href="stays.html#healing-camp">The Healing Camp</a></li><li><a href="stays.html#floating-homestay">Floating Homestay</a></li></ul></div>
+        <div><h4>Contact</h4><ul class="footer-links"><li><a href="tel:+84327012901">+84 327 012 901</a></li><li><a href="mailto:info@catbaoutdoors.vn">info@catbaoutdoors.vn</a></li></ul></div>
       </div>
-      <div class="footer-bottom">
-        <span>&copy; 2026 Cat Ba Outdoors. All rights reserved.</span>
-        <span><a href="#">Privacy Policy</a></span>
-      </div>
+      <div class="footer-bottom"><span>&copy; 2026 Cat Ba Outdoors.</span><span><a href="#">Privacy Policy</a></span></div>
     </div>
   </footer>
 
@@ -199,6 +410,6 @@
   </div>
 
   <script src="js/main.js"></script>
-  <script>loadTourDetail();</script>
+  <script src="js/tour-detail.js"></script>
 </body>
 </html>

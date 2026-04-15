@@ -4,8 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cat Ba Outdoors — Off the Beaten Path</title>
-  <meta name="description" content="Cat Ba Outdoors — A hospitality and lifestyle ecosystem rooted in Cat Ba Island. Tours, uncommon stays, and outdoor experiences in Lan Ha Bay.">
+  <meta name="description" content="Cat Ba Outdoors — Tours, stays, and outdoor experiences in Cat Ba Island and Lan Ha Bay. Book your adventure today.">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/homepage.css">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌊</text></svg>">
 </head>
 <body>
@@ -13,7 +14,7 @@
   <!-- Navigation -->
   <nav class="nav" id="mainNav">
     <div class="nav-inner">
-      <a href="/" class="nav-logo">Cat Ba <span>Outdoors</span></a>
+      <a href="/" class="nav-logo"><img src="img/logo.jpg" alt="Cat Ba Outdoors"><div class="nav-logo-text">Catba Outdoors<span>Off the beaten path</span></div></a>
       <ul class="nav-links">
         <li class="nav-dropdown">
           <a href="tours.html" class="nav-link">Adventure</a>
@@ -53,34 +54,147 @@
     </div>
   </nav>
 
-  <!-- Hero -->
+  <!-- Hero (Beka Travel style) -->
   <section class="hero">
     <div class="hero-bg">
       <!-- Replace with: <img src="img/hero.jpg" alt="" style="width:100%;height:100%;object-fit:cover;"> -->
     </div>
     <div class="hero-content">
-      <div class="hero-tag">Cat Ba Island &bull; Lan Ha Bay</div>
-      <h1>We craft the <em>unreal</em></h1>
-      <p class="hero-desc">A hospitality and lifestyle ecosystem rooted in Cat Ba Island — built around nature, sea, and a slower way of living.</p>
-      <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
-        <a href="tours.html" class="btn btn-primary btn-lg">Explore Adventures</a>
-        <a href="stays.html" class="btn btn-outline btn-lg">Uncommon Stays</a>
+      <h1 class="hero-headline">Bring you <em>real local experiences</em></h1>
+      <p class="hero-desc">Explore the best tours and stays on Cat Ba Island & Lan Ha Bay</p>
+    </div>
+
+    <!-- Search Box with Tabs (Beka style) -->
+    <div class="search-box">
+      <!-- Tabs -->
+      <div class="search-tabs">
+        <button class="search-tab active" data-tab="tours" onclick="switchSearchTab('tours')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+          Tours
+        </button>
+        <button class="search-tab" data-tab="transport" onclick="switchSearchTab('transport')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+          Transportation
+        </button>
+        <button class="search-tab" data-tab="stay" onclick="switchSearchTab('stay')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          Stay
+        </button>
+      </div>
+
+      <!-- Search Fields -->
+      <div class="search-box-inner">
+        <div class="search-field search-field-location">
+          <div class="search-field-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <div>
+            <label class="search-label">Location</label>
+            <select id="searchService" class="search-select">
+              <option value="">Where are you going?</option>
+              <option value="lan-ha-bay">Lan Ha Bay</option>
+              <option value="cat-ba-island">Cat Ba Island</option>
+              <option value="cat-ba-national-park">Cat Ba National Park</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="search-divider"></div>
+
+        <div class="search-field">
+          <div class="search-field-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </div>
+          <div>
+            <label class="search-label">Date</label>
+            <input type="date" id="searchCheckin" class="search-input" placeholder="Add date">
+          </div>
+        </div>
+
+        <div class="search-divider"></div>
+
+        <div class="search-field">
+          <div class="search-field-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </div>
+          <div>
+            <label class="search-label">Check out</label>
+            <input type="date" id="searchCheckout" class="search-input" placeholder="Add date">
+          </div>
+        </div>
+
+        <div class="search-divider"></div>
+
+        <!-- Guests -->
+        <div class="search-field search-field-guests">
+          <div class="search-field-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2"/><circle cx="9" cy="7" r="4"/></svg>
+          </div>
+          <div style="flex:1;">
+            <label class="search-label">Guests</label>
+            <button type="button" class="search-guest-toggle" id="guestToggle">
+              <span id="guestSummary">1 adult</span>
+              <span class="search-chevron">&#9662;</span>
+            </button>
+          </div>
+          <div class="guest-dropdown" id="guestDropdown">
+            <div class="guest-row">
+              <div class="guest-info"><div class="guest-type">Adults</div><div class="guest-desc">Age 13+</div></div>
+              <div class="guest-counter">
+                <button type="button" class="counter-btn" onclick="updateGuest('adults', -1)">-</button>
+                <span id="adults-count">1</span>
+                <button type="button" class="counter-btn" onclick="updateGuest('adults', 1)">+</button>
+              </div>
+            </div>
+            <div class="guest-row">
+              <div class="guest-info"><div class="guest-type">Infants</div><div class="guest-desc">Under 2 years</div></div>
+              <div class="guest-counter">
+                <button type="button" class="counter-btn" onclick="updateGuest('infants', -1)">-</button>
+                <span id="infants-count">0</span>
+                <button type="button" class="counter-btn" onclick="updateGuest('infants', 1)">+</button>
+              </div>
+            </div>
+            <div class="guest-row">
+              <div class="guest-info"><div class="guest-type">Children</div><div class="guest-desc">Age 2 - 6</div></div>
+              <div class="guest-counter">
+                <button type="button" class="counter-btn" onclick="updateGuest('children26', -1)">-</button>
+                <span id="children26-count">0</span>
+                <button type="button" class="counter-btn" onclick="updateGuest('children26', 1)">+</button>
+              </div>
+            </div>
+            <div class="guest-row">
+              <div class="guest-info"><div class="guest-type">Kids</div><div class="guest-desc">Age 6 - 12</div></div>
+              <div class="guest-counter">
+                <button type="button" class="counter-btn" onclick="updateGuest('children612', -1)">-</button>
+                <span id="children612-count">0</span>
+                <button type="button" class="counter-btn" onclick="updateGuest('children612', 1)">+</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button type="button" class="search-btn" onclick="handleSearch()">Search</button>
       </div>
     </div>
   </section>
 
-  <!-- Featured Tours -->
-  <section class="section">
+  <!-- Recommended For You -->
+  <section class="section hp-recommended" style="padding-top:6rem;">
     <div class="container">
-      <div class="section-title fade-in">
-        <h2>Adventures</h2>
-        <p>Curated outdoor experiences on Cat Ba Island and Lan Ha Bay</p>
+      <h2 class="hp-section-title">Recommended For You</h2>
+
+      <!-- Filter tabs -->
+      <div class="hp-filter-tabs">
+        <button class="hp-filter-tab active" onclick="filterTours('all', this)">Tour</button>
+        <button class="hp-filter-tab" onclick="filterTours('experience', this)">Activity</button>
       </div>
-      <div class="grid grid-3" id="featuredTours">
+
+      <div class="hp-tour-grid" id="recommendedTours">
         <!-- Loaded via JS -->
       </div>
+
       <div class="text-center mt-4">
-        <a href="tours.html" class="btn btn-dark">View All Adventures</a>
+        <a href="tours.html" class="btn btn-dark btn-lg">View All Adventures</a>
       </div>
     </div>
   </section>
@@ -88,65 +202,79 @@
   <!-- Uncommon Stays -->
   <section class="section bg-light">
     <div class="container">
-      <div class="section-title fade-in">
-        <h2>The Uncommon Stay</h2>
-        <p>Places designed to feel grounded, human, and real</p>
-      </div>
+      <h2 class="hp-section-title">The Uncommon Stay</h2>
+      <p class="hp-section-subtitle">Places designed to feel grounded, human, and real</p>
 
-      <!-- Healing Camp -->
-      <div class="stay-card fade-in">
-        <div class="stay-card-img img-placeholder">Photo: The Healing Camp</div>
-        <div class="stay-card-body">
-          <h3>The Healing Camp</h3>
-          <p>A seaside camp where nature sets the rhythm. Wake to ocean sounds, dine on mindful meals, and let the island pace slow you down.</p>
-          <ul class="stay-features">
-            <li>Seaside camping</li>
-            <li>Mindful dining</li>
-            <li>Wellness</li>
-            <li>Ocean views</li>
-            <li>Bar & lounge</li>
-          </ul>
-          <a href="stays.html#healing-camp" class="btn btn-dark btn-sm">Discover</a>
+      <div class="hp-stays-grid">
+        <!-- Healing Camp -->
+        <div class="hp-stay-card">
+          <div class="hp-stay-img img-placeholder">Photo: The Healing Camp</div>
+          <div class="hp-stay-body">
+            <span class="hp-stay-tag">Seaside Camp</span>
+            <h3>The Healing Camp</h3>
+            <p>A seaside camp where nature sets the rhythm. Wake to ocean sounds, dine on mindful meals, and let the island pace slow you down.</p>
+            <div class="hp-stay-features">
+              <span>Camping</span><span>Dining</span><span>Wellness</span><span>Bar</span>
+            </div>
+            <div class="hp-stay-footer">
+              <span class="hp-stay-price">From 500,000 VND</span>
+              <a href="stays.html#healing-camp" class="btn btn-primary btn-sm">Discover</a>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <!-- Floating Homestay -->
-      <div class="stay-card fade-in">
-        <div class="stay-card-img img-placeholder">Photo: Lan Ha Floating Homestay</div>
-        <div class="stay-card-body">
-          <h3>Lan Ha Floating Homestay</h3>
-          <p>An uncommon stay on the water. Our floating homestay sits quietly in Lan Ha Bay — surrounded by karst mountains, far from noise, close to everything that matters.</p>
-          <ul class="stay-features">
-            <li>Floating house</li>
-            <li>Kayaking</li>
-            <li>Fishing</li>
-            <li>Fresh seafood</li>
-            <li>Stargazing</li>
-          </ul>
-          <a href="stays.html#floating-homestay" class="btn btn-dark btn-sm">Discover</a>
+        <!-- Floating Homestay -->
+        <div class="hp-stay-card">
+          <div class="hp-stay-img img-placeholder">Photo: Lan Ha Floating Homestay</div>
+          <div class="hp-stay-body">
+            <span class="hp-stay-tag">Floating Stay</span>
+            <h3>Lan Ha Floating Homestay</h3>
+            <p>An uncommon stay on the water — surrounded by karst mountains, far from noise, close to everything that matters.</p>
+            <div class="hp-stay-features">
+              <span>Floating house</span><span>Kayaking</span><span>Fishing</span><span>Stargazing</span>
+            </div>
+            <div class="hp-stay-footer">
+              <span class="hp-stay-price">From 800,000 VND</span>
+              <a href="stays.html#floating-homestay" class="btn btn-primary btn-sm">Discover</a>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Philosophy -->
+  <!-- Why Choose Us -->
   <section class="section">
     <div class="container">
-      <div class="feature-grid">
-        <div class="feature fade-in">
-          <div class="feature-icon">&#9733;</div>
-          <h4>Experience-led</h4>
-          <p>Not trend-led. Every experience is shaped by the island itself — its tides, its seasons, its rhythm.</p>
+      <h2 class="hp-section-title">Why Cat Ba Outdoors?</h2>
+      <div class="hp-why-grid">
+        <div class="hp-why-card">
+          <div class="hp-why-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <h4>Local Expertise</h4>
+          <p>Born and raised on Cat Ba Island. We know every hidden lagoon, quiet beach, and secret trail.</p>
         </div>
-        <div class="feature fade-in">
-          <div class="feature-icon">&#9672;</div>
-          <h4>Long-term thinking</h4>
-          <p>Growth is not about scale alone, but depth — deeper experiences and more meaningful connections.</p>
+        <div class="hp-why-card">
+          <div class="hp-why-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+          </div>
+          <h4>Small Groups</h4>
+          <p>Limited to 25 guests max. More personal, more meaningful, more real.</p>
         </div>
-        <div class="feature fade-in">
-          <div class="feature-icon">&#10047;</div>
-          <h4>Grounded & real</h4>
-          <p>We create the conditions for rest, connection, and belonging — even if only for a few days.</p>
+        <div class="hp-why-card">
+          <div class="hp-why-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <h4>Free Cancellation</h4>
+          <p>Plans change. Cancel up to 24 hours before for a full refund. No questions asked.</p>
+        </div>
+        <div class="hp-why-card">
+          <div class="hp-why-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+          </div>
+          <h4>Bilingual Guides</h4>
+          <p>All tours led by English & Vietnamese speaking professional guides.</p>
         </div>
       </div>
     </div>
@@ -155,10 +283,8 @@
   <!-- Services -->
   <section class="section bg-light">
     <div class="container">
-      <div class="section-title fade-in">
-        <h2>Services</h2>
-        <p>Everything you need for a seamless Cat Ba experience</p>
-      </div>
+      <h2 class="hp-section-title">Services</h2>
+      <p class="hp-section-subtitle">Everything you need for a seamless Cat Ba experience</p>
       <div class="grid grid-3">
         <div class="service-card fade-in">
           <div class="service-icon">&#128663;</div>
@@ -177,6 +303,48 @@
           <h4>Rental</h4>
           <p class="text-muted text-sm mt-1">Kayaks, paddleboards, bikes, camping gear, and outdoor equipment.</p>
           <a href="services.html#rental" class="btn btn-sm btn-dark mt-2">Learn More</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section class="section">
+    <div class="container">
+      <h2 class="hp-section-title">Testimonial</h2>
+      <div class="hp-testimonial-grid">
+        <div class="hp-testimonial">
+          <div class="hp-testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p>"Amazing experience! The crew was fantastic, Lan Ha Bay is breathtaking. Highly recommend Cat Ba Outdoors for anyone visiting the island."</p>
+          <div class="hp-testimonial-author">
+            <div class="hp-testimonial-avatar img-placeholder">JD</div>
+            <div>
+              <strong>John D.</strong>
+              <span>United Kingdom</span>
+            </div>
+          </div>
+        </div>
+        <div class="hp-testimonial">
+          <div class="hp-testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p>"The floating homestay was one of the best experiences of our trip to Vietnam. Sleeping on the water, fishing at sunrise — unforgettable!"</p>
+          <div class="hp-testimonial-author">
+            <div class="hp-testimonial-avatar img-placeholder">SL</div>
+            <div>
+              <strong>Sarah L.</strong>
+              <span>Australia</span>
+            </div>
+          </div>
+        </div>
+        <div class="hp-testimonial">
+          <div class="hp-testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p>"Best day cruise in Lan Ha Bay! Small group, great food, and the kayaking through karsts was incredible. Will definitely come back."</p>
+          <div class="hp-testimonial-author">
+            <div class="hp-testimonial-avatar img-placeholder">MT</div>
+            <div>
+              <strong>Minh T.</strong>
+              <span>Vietnam</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -251,7 +419,25 @@
 
   <script src="js/main.js"></script>
   <script>
-    loadTours('featuredTours', { featured: true, limit: 3 });
+    // Load recommended tours
+    loadTours('recommendedTours');
+
+    // Filter tabs
+    function filterTours(category, btn) {
+      document.querySelectorAll('.hp-filter-tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      if (category === 'all') {
+        loadTours('recommendedTours');
+      } else {
+        loadTours('recommendedTours', { category });
+      }
+    }
+
+    // Search tab switching
+    function switchSearchTab(tab) {
+      document.querySelectorAll('.search-tab').forEach(t => t.classList.remove('active'));
+      document.querySelector(`.search-tab[data-tab="${tab}"]`).classList.add('active');
+    }
   </script>
 </body>
 </html>

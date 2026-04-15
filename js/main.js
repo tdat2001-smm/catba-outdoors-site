@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initFAQ();
   initBookingForm();
   initMobileMenu();
+  initSearchBox();
 });
 
 /* -- Navigation scroll effect -- */
@@ -206,21 +207,35 @@ async function loadTours(containerId, options = {}) {
 
 function tourCardHTML(tour) {
   return `
-    <div class="card fade-in">
-      <div class="card-img img-placeholder" style="height:240px;">
+    <a href="tour-detail.html#id=${tour.id}" class="card fade-in" style="text-decoration:none;color:inherit;">
+      <div class="card-img img-placeholder" style="height:220px;position:relative;">
+        ${tour.featured ? '<span class="card-badge">Featured</span>' : ''}
+        <button class="card-heart" onclick="event.preventDefault();">&#9825;</button>
         ${tour.image ? `<img src="${tour.image}" alt="${tour.title}" onerror="this.style.display='none';this.parentElement.textContent='Photo: ${tour.title}'" style="width:100%;height:100%;object-fit:cover;">` : `Photo: ${tour.title}`}
       </div>
       <div class="card-body">
-        <div class="card-tag">${tour.category}</div>
-        <h4 class="card-title">${tour.title}</h4>
-        <p class="card-text">${tour.description}</p>
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:1rem;">
-          <div class="card-price">$${tour.price} <small>/ person</small></div>
-          <div class="card-meta">${tour.duration}</div>
+        <div class="card-location">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          ${tour.location}
         </div>
-        <a href="tour-detail.html?id=${tour.id}" class="btn btn-dark btn-sm mt-2" style="width:100%;justify-content:center;">View Details</a>
+        <h4 class="card-title">${tour.title}</h4>
+        <div class="card-rating">
+          <span class="card-rating-star">&#9733;</span>
+          <span class="card-rating-score">5</span>
+          <span class="card-rating-count">(${Math.floor(Math.random() * 80 + 20)} Reviews)</span>
+        </div>
+        <div class="card-footer">
+          <div>
+            <span class="card-price-label">From</span>
+            <span class="card-price-amount">$${tour.price}</span>
+          </div>
+          <div class="card-duration">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            ${tour.duration}
+          </div>
+        </div>
       </div>
-    </div>
+    </a>
   `;
 }
 
@@ -289,5 +304,114 @@ async function loadTourDetail() {
     initFadeIn();
   } catch (err) {
     console.error('Error loading tour:', err);
+  }
+}
+
+/* -- Search Box -- */
+const guestCounts = { adults: 1, infants: 0, children26: 0, children612: 0 };
+
+function initSearchBox() {
+  const toggle = document.getElementById('guestToggle');
+  const dropdown = document.getElementById('guestDropdown');
+  const field = document.querySelector('.search-field-guests');
+  if (!toggle || !dropdown || !field) return;
+
+  // Toggle guest dropdown
+  toggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    field.classList.toggle('open');
+  });
+
+  // Close dropdown on outside click
+  document.addEventListener('click', (e) => {
+    if (!field.contains(e.target)) {
+      field.classList.remove('open');
+    }
+  });
+
+  // Set min date to today
+  const today = new Date().toISOString().split('T')[0];
+  const checkin = document.getElementById('searchCheckin');
+  const checkout = document.getElementById('searchCheckout');
+  if (checkin) {
+    checkin.min = today;
+    checkin.addEventListener('change', () => {
+      if (checkout) checkout.min = checkin.value;
+    });
+  }
+
+  updateGuestSummary();
+}
+
+function updateGuest(type, delta) {
+  const min = type === 'adults' ? 1 : 0;
+  const max = 20;
+  guestCounts[type] = Math.max(min, Math.min(max, guestCounts[type] + delta));
+
+  const countEl = document.getElementById(type + '-count');
+  if (countEl) countEl.textContent = guestCounts[type];
+
+  // Disable buttons at limits
+  updateCounterButtons(type);
+  updateGuestSummary();
+}
+
+function updateCounterButtons(type) {
+  const min = type === 'adults' ? 1 : 0;
+  const row = document.getElementById(type + '-count')?.closest('.guest-row');
+  if (!row) return;
+  const btns = row.querySelectorAll('.counter-btn');
+  if (btns[0]) btns[0].disabled = guestCounts[type] <= min;
+  if (btns[1]) btns[1].disabled = guestCounts[type] >= 20;
+}
+
+function updateGuestSummary() {
+  const el = document.getElementById('guestSummary');
+  if (!el) return;
+
+  const { adults, infants, children26, children612 } = guestCounts;
+  const totalChildren = infants + children26 + children612;
+
+  let parts = [];
+  parts.push(adults + (adults === 1 ? ' adult' : ' adults'));
+  if (totalChildren > 0) {
+    parts.push(totalChildren + (totalChildren === 1 ? ' child' : ' children'));
+  }
+  if (infants > 0) {
+    parts.push(infants + (infants === 1 ? ' infant' : ' infants'));
+  }
+
+  el.textContent = parts.join(', ');
+
+  // Update all counter buttons
+  ['adults', 'infants', 'children26', 'children612'].forEach(updateCounterButtons);
+}
+
+function handleSearch() {
+  const service = document.getElementById('searchService')?.value || '';
+  const checkin = document.getElementById('searchCheckin')?.value || '';
+  const checkout = document.getElementById('searchCheckout')?.value || '';
+  const { adults, infants, children26, children612 } = guestCounts;
+
+  // Build query string
+  const params = new URLSearchParams();
+  if (service) params.set('service', service);
+  if (checkin) params.set('checkin', checkin);
+  if (checkout) params.set('checkout', checkout);
+  params.set('adults', adults);
+  if (infants > 0) params.set('infants', infants);
+  if (children26 > 0) params.set('children26', children26);
+  if (children612 > 0) params.set('children612', children612);
+
+  // Map service to page
+  const stayServices = ['healing-camp', 'floating-homestay'];
+  const serviceServices = ['transport', 'workshop', 'rental'];
+
+  if (stayServices.includes(service)) {
+    window.location.href = 'stays.html#' + service + '?' + params.toString();
+  } else if (serviceServices.includes(service)) {
+    window.location.href = 'services.html#' + service + '?' + params.toString();
+  } else {
+    window.location.href = 'tours.html?' + params.toString();
   }
 }
