@@ -184,9 +184,12 @@
       <h2 class="hp-section-title">Recommended For You</h2>
 
       <!-- Filter tabs -->
-      <div class="hp-filter-tabs">
-        <button class="hp-filter-tab active" onclick="filterTours('all', this)">Tour</button>
-        <button class="hp-filter-tab" onclick="filterTours('experience', this)">Activity</button>
+      <div class="hp-filter-tabs" id="tourFilterTabs">
+        <button class="hp-filter-tab active" onclick="filterByTag('all', this)">All</button>
+        <button class="hp-filter-tab" onclick="filterByTag('Cruise', this)">Cruise</button>
+        <button class="hp-filter-tab" onclick="filterByTag('Kayak', this)">Kayak</button>
+        <button class="hp-filter-tab" onclick="filterByTag('Trekking', this)">Trekking</button>
+        <button class="hp-filter-tab" onclick="filterByTag('Night Tour', this)">Night Tour</button>
       </div>
 
       <div class="hp-tour-grid" id="recommendedTours">
@@ -422,14 +425,14 @@
     // Load recommended tours
     loadTours('recommendedTours');
 
-    // Filter tabs
-    function filterTours(category, btn) {
+    // Filter by tag
+    function filterByTag(tag, btn) {
       document.querySelectorAll('.hp-filter-tab').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      if (category === 'all') {
+      if (tag === 'all') {
         loadTours('recommendedTours');
       } else {
-        loadTours('recommendedTours', { category });
+        loadTours('recommendedTours', { tag });
       }
     }
 

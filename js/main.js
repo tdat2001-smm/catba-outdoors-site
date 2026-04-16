@@ -195,11 +195,16 @@ async function loadTours(containerId, options = {}) {
     if (options.category) {
       filtered = tours.filter(t => t.category === options.category);
     }
+    if (options.tag) {
+      filtered = tours.filter(t => t.tags && t.tags.includes(options.tag));
+    }
     if (options.limit) {
       filtered = filtered.slice(0, options.limit);
     }
 
     container.innerHTML = filtered.map(tour => tourCardHTML(tour)).join('');
+    // Re-init fade-in observer for dynamically added cards
+    initFadeIn();
   } catch (err) {
     console.error('Error loading tours:', err);
   }
@@ -219,6 +224,7 @@ function tourCardHTML(tour) {
           ${tour.location}
         </div>
         <h4 class="card-title">${tour.title}</h4>
+        ${tour.tags ? `<div class="card-tags">${tour.tags.slice(0,3).map(t => `<span class="card-tag-pill">${t}</span>`).join('')}</div>` : ''}
         <div class="card-rating">
           <span class="card-rating-star">&#9733;</span>
           <span class="card-rating-score">${tour.rating || 5}</span>

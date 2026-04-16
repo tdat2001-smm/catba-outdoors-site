@@ -64,10 +64,14 @@
   <section class="section">
     <div class="container">
       <!-- Filter bar -->
-      <div style="display:flex;gap:0.75rem;margin-bottom:2.5rem;flex-wrap:wrap;">
+      <div style="display:flex;gap:0.5rem;margin-bottom:2.5rem;flex-wrap:wrap;">
         <button class="btn btn-sm btn-dark tour-filter active" data-filter="all">All</button>
-        <button class="btn btn-sm btn-outline tour-filter" style="border-color:var(--color-gray-200);color:var(--color-gray-800);" data-filter="adventure">Adventure</button>
-        <button class="btn btn-sm btn-outline tour-filter" style="border-color:var(--color-gray-200);color:var(--color-gray-800);" data-filter="experience">Experience</button>
+        <button class="btn btn-sm btn-outline tour-filter" style="border-color:var(--color-gray-200);color:var(--color-gray-800);" data-filter="Cruise">Cruise</button>
+        <button class="btn btn-sm btn-outline tour-filter" style="border-color:var(--color-gray-200);color:var(--color-gray-800);" data-filter="Kayak">Kayak</button>
+        <button class="btn btn-sm btn-outline tour-filter" style="border-color:var(--color-gray-200);color:var(--color-gray-800);" data-filter="Trekking">Trekking</button>
+        <button class="btn btn-sm btn-outline tour-filter" style="border-color:var(--color-gray-200);color:var(--color-gray-800);" data-filter="Night Tour">Night Tour</button>
+        <button class="btn btn-sm btn-outline tour-filter" style="border-color:var(--color-gray-200);color:var(--color-gray-800);" data-filter="Full Day">Full Day</button>
+        <button class="btn btn-sm btn-outline tour-filter" style="border-color:var(--color-gray-200);color:var(--color-gray-800);" data-filter="Half Day">Half Day</button>
       </div>
 
       <div class="grid grid-3" id="allTours">
@@ -157,7 +161,7 @@
         if (filter === 'all') {
           loadTours('allTours');
         } else {
-          loadTours('allTours', { category: filter });
+          loadTours('allTours', { tag: filter });
         }
       });
     });

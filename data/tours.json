@@ -13,7 +13,9 @@
     "location": "Lan Ha Bay",
     "category": "adventure",
     "tourType": "Daily Tour",
-    "languages": ["English"],
+    "languages": [
+      "English"
+    ],
     "maxGuests": 30,
     "reviews": 114,
     "rating": 5,
@@ -37,35 +39,103 @@
       "Waterslide",
       "Travel insurance"
     ],
-    "excludes": ["Drinks", "Personal expenses", "Tips for tour guide"],
+    "excludes": [
+      "Drinks",
+      "Personal expenses",
+      "Tips for tour guide"
+    ],
     "itinerary": [
-      {"time": "08:00", "activity": "Hotel pick up & transfer to Ben Beo Harbour"},
-      {"time": "08:45", "activity": "Depart & visit Floating Fishing Village. Cruise through and admire iconic islets like Turtle, Toad, and Candle Islets"},
-      {"time": "10:00", "activity": "Swim & snorkel at Ba Trai Dao Beaches. Enjoy crystal-clear water, slide or jump from the boat"},
-      {"time": "11:00", "activity": "Kayaking & Lagoons Exploration. Kayaking at Bright Cave or Tai Keo Cave, and discovering hidden lagoons"},
-      {"time": "12:30", "activity": "Vietnamese Traditional Lunch on board (Vegi/Vegan options available)"},
-      {"time": "14:00", "activity": "Back to Lan Ha Bay — Visit Floating Fish Farm. Experience daily life at a floating fish farm and see seafood raised in the bay"},
-      {"time": "15:30", "activity": "Refresh with a Swim or Explore Monkey Island. Spend time on a pristine beach, encounter monkeys, and hike to the island viewpoint"},
-      {"time": "16:30", "activity": "Sunset Party in Lan Ha Bay. Enjoy tea, fresh fruits, crackers, and drinks while admiring the breathtaking sunset"},
-      {"time": "17:00", "activity": "End of itinerary. Tour guide escorts guests back to their hotel"}
+      {
+        "time": "08:00",
+        "activity": "Hotel pick up & transfer to Ben Beo Harbour"
+      },
+      {
+        "time": "08:45",
+        "activity": "Depart & visit Floating Fishing Village. Cruise through and admire iconic islets like Turtle, Toad, and Candle Islets"
+      },
+      {
+        "time": "10:00",
+        "activity": "Swim & snorkel at Ba Trai Dao Beaches. Enjoy crystal-clear water, slide or jump from the boat"
+      },
+      {
+        "time": "11:00",
+        "activity": "Kayaking & Lagoons Exploration. Kayaking at Bright Cave or Tai Keo Cave, and discovering hidden lagoons"
+      },
+      {
+        "time": "12:30",
+        "activity": "Vietnamese Traditional Lunch on board (Vegi/Vegan options available)"
+      },
+      {
+        "time": "14:00",
+        "activity": "Back to Lan Ha Bay — Visit Floating Fish Farm. Experience daily life at a floating fish farm and see seafood raised in the bay"
+      },
+      {
+        "time": "15:30",
+        "activity": "Refresh with a Swim or Explore Monkey Island. Spend time on a pristine beach, encounter monkeys, and hike to the island viewpoint"
+      },
+      {
+        "time": "16:30",
+        "activity": "Sunset Party in Lan Ha Bay. Enjoy tea, fresh fruits, crackers, and drinks while admiring the breathtaking sunset"
+      },
+      {
+        "time": "17:00",
+        "activity": "End of itinerary. Tour guide escorts guests back to their hotel"
+      }
     ],
     "menu": [
-      "Cat Ba squid rolls", "Fried egg rolls with onion", "Seafood spring rolls",
-      "Salted roasted peanuts", "Steamed rice", "Cucumber and tomato salad",
-      "Stir-fried minced chicken/squid", "Tofu in tomato sauce",
-      "Stir-fried seasonal vegetables", "Fish in tomato sauce"
+      "Cat Ba squid rolls",
+      "Fried egg rolls with onion",
+      "Seafood spring rolls",
+      "Salted roasted peanuts",
+      "Steamed rice",
+      "Cucumber and tomato salad",
+      "Stir-fried minced chicken/squid",
+      "Tofu in tomato sauce",
+      "Stir-fried seasonal vegetables",
+      "Fish in tomato sauce"
     ],
     "packages": [
-      {"name": "Pick up - Drop off Cat Ba town", "priceAdult": 35, "priceChild": 25},
-      {"name": "Pick up - Drop off Ha Noi", "priceAdult": 61, "priceChild": 51},
-      {"name": "Pick up Ha Noi - Drop off Cat Ba town", "priceAdult": 48, "priceChild": 40},
-      {"name": "Pick up Cat Ba - Drop off Hanoi", "priceAdult": 48, "priceChild": 40},
-      {"name": "Pick up Hanoi - Drop off Ninh Binh", "priceAdult": 68, "priceChild": 60},
-      {"name": "Pick up Cat Ba - Drop off Ninh Binh", "priceAdult": 55, "priceChild": 47}
+      {
+        "name": "Pick up - Drop off Cat Ba town",
+        "priceAdult": 35,
+        "priceChild": 25
+      },
+      {
+        "name": "Pick up - Drop off Ha Noi",
+        "priceAdult": 61,
+        "priceChild": 51
+      },
+      {
+        "name": "Pick up Ha Noi - Drop off Cat Ba town",
+        "priceAdult": 48,
+        "priceChild": 40
+      },
+      {
+        "name": "Pick up Cat Ba - Drop off Hanoi",
+        "priceAdult": 48,
+        "priceChild": 40
+      },
+      {
+        "name": "Pick up Hanoi - Drop off Ninh Binh",
+        "priceAdult": 68,
+        "priceChild": 60
+      },
+      {
+        "name": "Pick up Cat Ba - Drop off Ninh Binh",
+        "priceAdult": 55,
+        "priceChild": 47
+      }
     ],
     "image": "img/tour-full-day-cruise.jpg",
     "gallery": [],
-    "featured": true
+    "featured": true,
+    "tags": [
+      "Cruise",
+      "Kayak",
+      "Full Day",
+      "Snorkeling",
+      "Swimming"
+    ]
   },
   {
     "id": "night-kayaking-glowing-plankton",
@@ -81,7 +151,10 @@
     "location": "Lan Ha Bay",
     "category": "adventure",
     "tourType": "Evening Tour",
-    "languages": ["English", "Vietnamese"],
+    "languages": [
+      "English",
+      "Vietnamese"
+    ],
     "maxGuests": 20,
     "reviews": 87,
     "rating": 5,
@@ -103,18 +176,46 @@
       "Dry-bags",
       "Towels"
     ],
-    "excludes": ["Drinks", "Personal expenses", "Tips"],
+    "excludes": [
+      "Drinks",
+      "Personal expenses",
+      "Tips"
+    ],
     "itinerary": [
-      {"time": "16:00", "activity": "Pick you up, heading to Radio Tower for a panoramic sunset viewpoint"},
-      {"time": "18:30", "activity": "Dinner — traditional Vietnamese dishes on floating house in Cai Beo fishing village"},
-      {"time": "19:30", "activity": "Cruise under the stars and moonlight to Lan Ha Bay"},
-      {"time": "19:30", "activity": "Kayak at night, swim to see all your sparking body and experience glowing plankton"},
-      {"time": "20:30", "activity": "Back to the floating house, get on the boat to get back to Beo Harbour"},
-      {"time": "21:00", "activity": "Arrive by the harbor, get back to the hotel"}
+      {
+        "time": "16:00",
+        "activity": "Pick you up, heading to Radio Tower for a panoramic sunset viewpoint"
+      },
+      {
+        "time": "18:30",
+        "activity": "Dinner — traditional Vietnamese dishes on floating house in Cai Beo fishing village"
+      },
+      {
+        "time": "19:30",
+        "activity": "Cruise under the stars and moonlight to Lan Ha Bay"
+      },
+      {
+        "time": "19:30",
+        "activity": "Kayak at night, swim to see all your sparking body and experience glowing plankton"
+      },
+      {
+        "time": "20:30",
+        "activity": "Back to the floating house, get on the boat to get back to Beo Harbour"
+      },
+      {
+        "time": "21:00",
+        "activity": "Arrive by the harbor, get back to the hotel"
+      }
     ],
     "image": "img/tour-night-kayaking.jpg",
     "gallery": [],
-    "featured": true
+    "featured": true,
+    "tags": [
+      "Kayak",
+      "Night Tour",
+      "Bioluminescent",
+      "Dinner"
+    ]
   },
   {
     "id": "full-day-trekking-national-park",
@@ -130,7 +231,9 @@
     "location": "Cat Ba National Park",
     "category": "adventure",
     "tourType": "Trekking & Kayaking",
-    "languages": ["English"],
+    "languages": [
+      "English"
+    ],
     "maxGuests": 20,
     "reviews": 68,
     "rating": 5,
@@ -156,16 +259,44 @@
       "A big bottle of mineral water each guest",
       "Tourist insurance"
     ],
-    "excludes": ["Drinks", "Personal expenses", "Tips for tour guide"],
+    "excludes": [
+      "Drinks",
+      "Personal expenses",
+      "Tips for tour guide"
+    ],
     "itinerary": [
-      {"time": "07:45", "activity": "Bus and tour guide pick you up at your hotel in Cat Ba town"},
-      {"time": "08:30", "activity": "Arrive National Park gate, take entrance fee and start trekking. On the trail through tropical forest — see mink, squirrel, monkey, birds and butterflies. Climb 3 mountains: Ang Vat, May Bau, Ang Phay"},
-      {"time": "11:30", "activity": "After 2.5 hours trekking (about 6 km), stop at the Frog Pond — the largest freshwater lake in the middle of the national forest. Rest 30 minutes"},
-      {"time": "12:00", "activity": "Continue trekking from Frog Pond up the last mountain named Doc Dai to Viet Hai Village (4 km) — a small ancient village of about 100 families"},
-      {"time": "13:00", "activity": "Have lunch and take a rest at Viet Hai Village. Experience fish massage your feet in cool stream flowing from Cat Ba primeval forest"},
-      {"time": "14:00", "activity": "Free to explore Viet Hai Village by bicycle. Take bicycling 5km to Viet Hai harbor. Get on travel boat through Lan Ha Bay, stop at a floating home for kayaking"},
-      {"time": "16:00", "activity": "Boat takes you back to Cai Beo wharf, visit Cai Beo Fishing Floating Village on the way back"},
-      {"time": "17:00", "activity": "Arrive Cai Beo wharf, car takes you back to Cat Ba town center. Finish journey"}
+      {
+        "time": "07:45",
+        "activity": "Bus and tour guide pick you up at your hotel in Cat Ba town"
+      },
+      {
+        "time": "08:30",
+        "activity": "Arrive National Park gate, take entrance fee and start trekking. On the trail through tropical forest — see mink, squirrel, monkey, birds and butterflies. Climb 3 mountains: Ang Vat, May Bau, Ang Phay"
+      },
+      {
+        "time": "11:30",
+        "activity": "After 2.5 hours trekking (about 6 km), stop at the Frog Pond — the largest freshwater lake in the middle of the national forest. Rest 30 minutes"
+      },
+      {
+        "time": "12:00",
+        "activity": "Continue trekking from Frog Pond up the last mountain named Doc Dai to Viet Hai Village (4 km) — a small ancient village of about 100 families"
+      },
+      {
+        "time": "13:00",
+        "activity": "Have lunch and take a rest at Viet Hai Village. Experience fish massage your feet in cool stream flowing from Cat Ba primeval forest"
+      },
+      {
+        "time": "14:00",
+        "activity": "Free to explore Viet Hai Village by bicycle. Take bicycling 5km to Viet Hai harbor. Get on travel boat through Lan Ha Bay, stop at a floating home for kayaking"
+      },
+      {
+        "time": "16:00",
+        "activity": "Boat takes you back to Cai Beo wharf, visit Cai Beo Fishing Floating Village on the way back"
+      },
+      {
+        "time": "17:00",
+        "activity": "Arrive Cai Beo wharf, car takes you back to Cat Ba town center. Finish journey"
+      }
     ],
     "thingsToBring": [
       "Trekking shoes (long trousers advised)",
@@ -176,7 +307,14 @@
     ],
     "image": "img/tour-trekking-national-park.jpg",
     "gallery": [],
-    "featured": true
+    "featured": true,
+    "tags": [
+      "Trekking",
+      "Full Day",
+      "Kayak",
+      "National Park",
+      "Village"
+    ]
   },
   {
     "id": "half-day-trekking-cat-ba",
@@ -192,7 +330,9 @@
     "location": "Cat Ba National Park",
     "category": "adventure",
     "tourType": "Trekking",
-    "languages": ["English"],
+    "languages": [
+      "English"
+    ],
     "maxGuests": 20,
     "reviews": 45,
     "rating": 5,
@@ -209,17 +349,41 @@
       "A small bottle of water (0.5L)",
       "Insect repellent"
     ],
-    "excludes": ["Tipping and personal expenses", "Drinks"],
+    "excludes": [
+      "Tipping and personal expenses",
+      "Drinks"
+    ],
     "itinerary": [
-      {"time": "08:00", "activity": "Pick up by bus at your hotel in Cat Ba town center, driving along main road through the romantic island (about 20 minutes away)"},
-      {"time": "08:30", "activity": "Arrived at Cat Ba National Park gate, get off the bus then walk around 1.5km into the forest. Climb up hundreds stone steps and forest trails to Ngu Lam Peak (up and down in 2 hours)"},
-      {"time": "10:30", "activity": "Head to Trung Trang Cave — a natural limestone cave with many stalactites and stalagmites. Walk through 300m long from one side through the mountain to the other side"},
-      {"time": "11:15", "activity": "Visit Hospital Cave (Quan Y Cave) — a military hospital built in 1965 during the war, with 3 floors and 17 separate rooms"},
-      {"time": "12:00", "activity": "Head back to Cat Ba town, ending the trip"}
+      {
+        "time": "08:00",
+        "activity": "Pick up by bus at your hotel in Cat Ba town center, driving along main road through the romantic island (about 20 minutes away)"
+      },
+      {
+        "time": "08:30",
+        "activity": "Arrived at Cat Ba National Park gate, get off the bus then walk around 1.5km into the forest. Climb up hundreds stone steps and forest trails to Ngu Lam Peak (up and down in 2 hours)"
+      },
+      {
+        "time": "10:30",
+        "activity": "Head to Trung Trang Cave — a natural limestone cave with many stalactites and stalagmites. Walk through 300m long from one side through the mountain to the other side"
+      },
+      {
+        "time": "11:15",
+        "activity": "Visit Hospital Cave (Quan Y Cave) — a military hospital built in 1965 during the war, with 3 floors and 17 separate rooms"
+      },
+      {
+        "time": "12:00",
+        "activity": "Head back to Cat Ba town, ending the trip"
+      }
     ],
     "image": "img/tour-half-day-trekking.jpg",
     "gallery": [],
-    "featured": false
+    "featured": false,
+    "tags": [
+      "Trekking",
+      "Half Day",
+      "National Park",
+      "Cave"
+    ]
   },
   {
     "id": "eco-day-cruise-kayaking-lan-ha-bay",
@@ -235,7 +399,10 @@
     "location": "Lan Ha Bay",
     "category": "adventure",
     "tourType": "Cruise & Kayak",
-    "languages": ["English", "Vietnamese"],
+    "languages": [
+      "English",
+      "Vietnamese"
+    ],
     "maxGuests": 25,
     "reviews": 91,
     "rating": 5,
@@ -249,21 +416,68 @@
       "Hotel pick-up & drop-off included",
       "Small group — limited to 25 guests"
     ],
-    "includes": ["Pick up & drop-off", "Entrance fees", "EN Tour guide", "Lunch on board", "Kayaking", "Snorkeling mask", "Waterslide", "Travel insurance"],
-    "excludes": ["Drinks", "Personal expenses", "Tips for tour guide"],
+    "includes": [
+      "Pick up & drop-off",
+      "Entrance fees",
+      "EN Tour guide",
+      "Lunch on board",
+      "Kayaking",
+      "Snorkeling mask",
+      "Waterslide",
+      "Travel insurance"
+    ],
+    "excludes": [
+      "Drinks",
+      "Personal expenses",
+      "Tips for tour guide"
+    ],
     "itinerary": [
-      {"time": "08:00", "activity": "Hotel pick up & transfer to Ben Beo Harbour"},
-      {"time": "08:45", "activity": "Depart & visit Floating Fishing Village. Cruise through and admire iconic islets like Turtle, Toad, and Candle Islets"},
-      {"time": "10:00", "activity": "Swim & snorkel at Ba Trai Dao Beaches. Enjoy crystal-clear water, slide or jump from the boat"},
-      {"time": "11:00", "activity": "Kayaking & Lagoons Exploration. Kayaking at Bright Cave or Tai Keo Cave, discovering hidden lagoons"},
-      {"time": "12:30", "activity": "Vietnamese Traditional Lunch on board (Vegi/Vegan options available)"},
-      {"time": "14:00", "activity": "Back to Lan Ha Bay — Visit Floating Fish Farm"},
-      {"time": "15:30", "activity": "Refresh with a Swim or Explore Monkey Island. Beach time, encounter monkeys, short hike to viewpoint"},
-      {"time": "16:30", "activity": "Sunset Party in Lan Ha Bay. Tea, fresh fruits, crackers, drinks while admiring the sunset"},
-      {"time": "17:00", "activity": "End of itinerary. Tour guide escorts guests back to their hotel"}
+      {
+        "time": "08:00",
+        "activity": "Hotel pick up & transfer to Ben Beo Harbour"
+      },
+      {
+        "time": "08:45",
+        "activity": "Depart & visit Floating Fishing Village. Cruise through and admire iconic islets like Turtle, Toad, and Candle Islets"
+      },
+      {
+        "time": "10:00",
+        "activity": "Swim & snorkel at Ba Trai Dao Beaches. Enjoy crystal-clear water, slide or jump from the boat"
+      },
+      {
+        "time": "11:00",
+        "activity": "Kayaking & Lagoons Exploration. Kayaking at Bright Cave or Tai Keo Cave, discovering hidden lagoons"
+      },
+      {
+        "time": "12:30",
+        "activity": "Vietnamese Traditional Lunch on board (Vegi/Vegan options available)"
+      },
+      {
+        "time": "14:00",
+        "activity": "Back to Lan Ha Bay — Visit Floating Fish Farm"
+      },
+      {
+        "time": "15:30",
+        "activity": "Refresh with a Swim or Explore Monkey Island. Beach time, encounter monkeys, short hike to viewpoint"
+      },
+      {
+        "time": "16:30",
+        "activity": "Sunset Party in Lan Ha Bay. Tea, fresh fruits, crackers, drinks while admiring the sunset"
+      },
+      {
+        "time": "17:00",
+        "activity": "End of itinerary. Tour guide escorts guests back to their hotel"
+      }
     ],
     "image": "img/tour-eco-cruise.jpg",
     "gallery": [],
-    "featured": true
+    "featured": true,
+    "tags": [
+      "Cruise",
+      "Kayak",
+      "Full Day",
+      "Snorkeling",
+      "Swimming"
+    ]
   }
 ]

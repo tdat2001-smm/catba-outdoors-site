@@ -159,6 +159,9 @@
 
 .hp-filter-tab:last-child {
   border-radius: 0 8px 8px 0;
+}
+
+.hp-filter-tab + .hp-filter-tab {
   border-left: none;
 }
 
@@ -245,6 +248,24 @@
 .hp-tour-grid .card-location svg {
   width: 12px;
   height: 12px;
+}
+
+/* Tags */
+.card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.75rem;
+}
+.card-tag-pill {
+  padding: 0.15rem 0.55rem;
+  background: var(--color-light);
+  color: var(--color-accent-dark);
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 /* Rating */
