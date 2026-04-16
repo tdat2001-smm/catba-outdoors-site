@@ -53,9 +53,54 @@ async function loadTourDetailPage() {
     document.getElementById('bookingPrice').textContent = `$${t.price}`;
 
     // Specs
-    document.getElementById('tourDuration').textContent = t.duration;
+    document.getElementById('tourDuration').textContent = t.durationDetail || t.duration;
     document.getElementById('tourMaxGuests').textContent = `Max ${t.maxGuests}`;
     document.getElementById('tourLanguages').textContent = t.languages?.join(', ') || 'English';
+
+    // Update review scores if available
+    const scoreEl = document.querySelector('.td-score-number');
+    if (scoreEl && t.rating) scoreEl.textContent = t.rating === 5 ? '5.0' : t.rating.toFixed(1);
+    const countEl = document.querySelector('.td-score-count');
+    if (countEl && t.reviews) countEl.textContent = `Based on ${t.reviews}+ reviews`;
+
+    // Packages table (if available, insert before description)
+    if (t.packages?.length) {
+      const packagesHTML = `
+        <div class="td-section">
+          <h2 class="td-section-title">Packages & Pricing</h2>
+          <table class="td-packages-table">
+            <thead><tr><th>Name Package</th><th>Price Adult</th><th>Price Children</th></tr></thead>
+            <tbody>${t.packages.map(p => `<tr><td>${p.name}</td><td>$${p.priceAdult}</td><td>$${p.priceChild}</td></tr>`).join('')}</tbody>
+          </table>
+        </div>
+      `;
+      document.getElementById('tourDesc').insertAdjacentHTML('afterend', packagesHTML);
+    }
+
+    // Things to bring (if available)
+    if (t.thingsToBring?.length) {
+      const bringHTML = `
+        <div class="td-section">
+          <h2 class="td-section-title">Things to Bring</h2>
+          <ul class="td-highlights">${t.thingsToBring.map(item => `<li>${item}</li>`).join('')}</ul>
+        </div>
+      `;
+      // Insert after includes/excludes section
+      const incExcSection = document.querySelector('.td-inc-exc')?.closest('.td-section');
+      if (incExcSection) incExcSection.insertAdjacentHTML('afterend', bringHTML);
+    }
+
+    // Menu (if available)
+    if (t.menu?.length) {
+      const menuHTML = `
+        <div class="td-section">
+          <h2 class="td-section-title">Menu</h2>
+          <div class="td-menu-grid">${t.menu.map(item => `<span class="td-menu-item">${item}</span>`).join('')}</div>
+        </div>
+      `;
+      const itinSection = document.getElementById('tourItinerary')?.closest('.td-section');
+      if (itinSection) itinSection.insertAdjacentHTML('afterend', menuHTML);
+    }
 
     // Description
     document.getElementById('tourDesc').innerHTML = `
@@ -113,7 +158,7 @@ async function loadTourDetailPage() {
 
     // Update price summary
     document.getElementById('summary-price').textContent = `$${t.price}`;
-    document.getElementById('summary-child-price').textContent = `$${Math.round(t.price * 0.6)}`;
+    document.getElementById('summary-child-price').textContent = `$${t.priceChild || Math.round(t.price * 0.7)}`;
     updateBookingSummary();
 
     // Load related tours
@@ -157,7 +202,7 @@ function updateBookingSummary() {
   if (!currentTour) return;
 
   const price = currentTour.price;
-  const childPrice = Math.round(price * 0.6);
+  const childPrice = currentTour.priceChild || Math.round(price * 0.7);
   const { adults, children } = bookingCounts;
 
   document.getElementById('summary-adults').textContent = adults;

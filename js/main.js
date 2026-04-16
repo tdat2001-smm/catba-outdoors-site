@@ -221,8 +221,8 @@ function tourCardHTML(tour) {
         <h4 class="card-title">${tour.title}</h4>
         <div class="card-rating">
           <span class="card-rating-star">&#9733;</span>
-          <span class="card-rating-score">5</span>
-          <span class="card-rating-count">(${Math.floor(Math.random() * 80 + 20)} Reviews)</span>
+          <span class="card-rating-score">${tour.rating || 5}</span>
+          <span class="card-rating-count">(${tour.reviews || 0} Reviews)</span>
         </div>
         <div class="card-footer">
           <div>
