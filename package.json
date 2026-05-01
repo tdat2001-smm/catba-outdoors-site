@@ -1,0 +1,15 @@
+{
+  "name": "catba-outdoors-site",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Cat Ba Outdoors — static site with Vercel serverless booking → Telegram bridge.",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel deploy --prod",
+    "telegram:set-webhook": "node scripts/telegram-set-webhook.js",
+    "telegram:get-chat-id": "node scripts/telegram-get-chat-id.js"
+  }
+}

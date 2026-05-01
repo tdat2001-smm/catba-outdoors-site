@@ -1314,35 +1314,74 @@ img { max-width: 100%; height: auto; display: block; }
   margin-bottom: 1rem;
 }
 
-/* Whatsapp / Zalo float */
+/* Floating contact plugins (Zalo / WhatsApp / Phone / Email) */
 .float-buttons {
   position: fixed;
-  bottom: 2rem;
-  right: 2rem;
+  bottom: 1.5rem;
+  right: 1.5rem;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.65rem;
   z-index: 999;
 }
 
 .float-btn {
-  width: 48px;
-  height: 48px;
+  position: relative;
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--color-white);
-  font-size: 1.2rem;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-  transition: transform 0.3s;
+  font-size: 1rem;
+  font-weight: 700;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.float-btn svg {
+  width: 26px;
+  height: 26px;
+  stroke: currentColor;
 }
 
 .float-btn:hover {
-  transform: scale(1.1);
+  transform: scale(1.08);
   color: var(--color-white);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.25);
 }
 
-.float-btn-zalo { background: #0068ff; }
+.float-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow: 0 0 0 0 currentColor;
+  opacity: 0.55;
+  animation: float-pulse 2.4s ease-out infinite;
+  pointer-events: none;
+}
+
+@keyframes float-pulse {
+  0%   { box-shadow: 0 0 0 0 currentColor; opacity: 0.55; }
+  70%  { box-shadow: 0 0 0 14px currentColor; opacity: 0; }
+  100% { box-shadow: 0 0 0 0 currentColor; opacity: 0; }
+}
+
+.float-btn-zalo     { background: #0068ff; }
 .float-btn-whatsapp { background: #25d366; }
-.float-btn-phone { background: var(--color-accent); }
+.float-btn-phone    { background: var(--color-accent); }
+.float-btn-email    { background: #ea4335; }
+
+.float-btn-zalo-text {
+  font-family: var(--font-sans);
+  font-size: 1.1rem;
+  letter-spacing: -0.02em;
+}
+
+@media (max-width: 600px) {
+  .float-buttons { bottom: 1rem; right: 1rem; gap: 0.5rem; }
+  .float-btn { width: 46px; height: 46px; }
+  .float-btn svg { width: 22px; height: 22px; }
+}
