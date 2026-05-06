@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog — Catba PMS</title>
+  <link rel="stylesheet" href="css/admin.css">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌊</text></svg>">
+</head>
+<body>
+  <div id="app-root"></div>
+  <script src="js/auth.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/layout.js"></script>
+  <script>
+    const session = AdminUI.renderLayout({
+      active: 'blog',
+      title: 'Blog & Bài viết',
+      breadcrumb: 'Catba PMS / Nội dung / Blog',
+      content: `
+        <div class="card">
+          <div class="card-head">
+            <h3>Bài viết</h3>
+            <button class="btn btn-accent btn-sm" id="addBtn">+ Bài viết mới</button>
+          </div>
+          <div class="card-body">
+            <div class="filter-bar">
+              <input type="text" id="search" class="search" placeholder="Tìm theo tiêu đề, tác giả...">
+              <select id="status">
+                <option value="">Tất cả trạng thái</option>
+                <option value="published">Đã xuất bản</option>
+                <option value="draft">Bản nháp</option>
+              </select>
+              <select id="cat"><option value="">Tất cả danh mục</option></select>
+            </div>
+            <div class="tbl-wrap">
+              <table class="tbl">
+                <thead>
+                  <tr>
+                    <th>Tiêu đề</th><th>Danh mục</th><th>Tác giả</th><th>Xuất bản</th><th>Trạng thái</th><th class="col-actions"></th>
+                  </tr>
+                </thead>
+                <tbody id="bBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      `
+    });
+
+    if (session) init();
+
+    function init() {
+      const cats = Array.from(new Set(Store.blog.all().map((b) => b.category)));
+      const cs = document.getElementById('cat');
+      cats.forEach((c) => { const o = document.createElement('option'); o.value = c; o.textContent = c; cs.appendChild(o); });
+      ['search','status','cat'].forEach((id) => document.getElementById(id).addEventListener('input', render));
+      document.getElementById('addBtn').addEventListener('click', () => editPost(null));
+      render();
+    }
+
+    function render() {
+      const q = document.getElementById('search').value.trim().toLowerCase();
+      const status = document.getElementById('status').value;
+      const cat = document.getElementById('cat').value;
+      const list = Store.blog.all().filter((b) => {
+        if (q && !(b.title.toLowerCase().includes(q) || b.author.toLowerCase().includes(q))) return false;
+        if (status && b.status !== status) return false;
+        if (cat && b.category !== cat) return false;
+        return true;
+      });
+      const body = document.getElementById('bBody');
+      if (!list.length) { body.innerHTML = '<tr><td colspan="6" class="tbl-empty">Không có bài viết</td></tr>'; return; }
+      body.innerHTML = list.map((b) => `
+        <tr>
+          <td>
+            <div style="font-weight:600">${AdminUI.escapeHtml(b.title)}</div>
+            <div style="color:var(--c-muted);font-size:.78rem">/${AdminUI.escapeHtml(b.slug)}</div>
+          </td>
+          <td>${AdminUI.escapeHtml(b.category)}</td>
+          <td>${AdminUI.escapeHtml(b.author)}</td>
+          <td>${b.published ? Fmt.date(b.published) : '—'}</td>
+          <td>${b.status === 'published' ? '<span class="badge success">Đã xuất bản</span>' : '<span class="badge warning">Nháp</span>'}</td>
+          <td class="col-actions">
+            <button class="btn btn-secondary btn-sm" data-edit="${b.id}">Sửa</button>
+            <button class="btn btn-danger btn-sm" data-del="${b.id}">Xoá</button>
+          </td>
+        </tr>
+      `).join('');
+      body.querySelectorAll('button[data-edit]').forEach((btn) => btn.addEventListener('click', () => editPost(btn.dataset.edit)));
+      body.querySelectorAll('button[data-del]').forEach((btn) => btn.addEventListener('click', () => {
+        if (!confirm('Xoá bài viết?')) return;
+        Store.blog.remove(btn.dataset.del); AdminUI.toast('Đã xoá', 'success'); render();
+      }));
+    }
+
+    function slugify(text) {
+      return (text || '').toLowerCase()
+        .normalize('NFD').replace(/[̀-ͯ]/g, '')
+        .replace(/đ/g,'d').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,80);
+    }
+
+    function editPost(id) {
+      const p = id ? Store.blog.all().find((x) => x.id === id) : { id: 'B' + String(Date.now()).slice(-5), title: '', slug: '', author: 'Admin Catba', category: 'Guideline', status: 'draft', published: '', excerpt: '', content: '' };
+      const body = `
+        <div class="form-row"><label>Tiêu đề</label><input id="pTitle" value="${AdminUI.escapeHtml(p.title)}"></div>
+        <div class="form-grid">
+          <div class="form-row"><label>Slug</label><input id="pSlug" value="${AdminUI.escapeHtml(p.slug)}"></div>
+          <div class="form-row"><label>Tác giả</label><input id="pAuthor" value="${AdminUI.escapeHtml(p.author)}"></div>
+          <div class="form-row"><label>Danh mục</label>
+            <select id="pCat">
+              ${['Guideline','Adventure','Stays','Food','Tips'].map((c) => `<option ${c===p.category?'selected':''}>${c}</option>`).join('')}
+            </select>
+          </div>
+          <div class="form-row"><label>Trạng thái</label>
+            <select id="pStatus">
+              <option value="draft" ${p.status==='draft'?'selected':''}>Bản nháp</option>
+              <option value="published" ${p.status==='published'?'selected':''}>Xuất bản</option>
+            </select>
+          </div>
+          <div class="form-row"><label>Ngày xuất bản</label><input id="pPub" type="date" value="${p.published}"></div>
+        </div>
+        <div class="form-row"><label>Mô tả ngắn</label><textarea id="pExcerpt" rows="2">${AdminUI.escapeHtml(p.excerpt)}</textarea></div>
+        <div class="form-row"><label>Nội dung</label><textarea id="pContent" rows="8">${AdminUI.escapeHtml(p.content)}</textarea></div>
+      `;
+      const footer = `<button class="btn btn-secondary" id="pCancel">Huỷ</button><button class="btn btn-accent" id="pSave">Lưu</button>`;
+      const m = AdminUI.openModal({ title: id ? 'Sửa bài viết' : 'Tạo bài viết', body, footer });
+      m.root.querySelector('#pCancel').addEventListener('click', m.close);
+      m.root.querySelector('#pTitle').addEventListener('input', (e) => {
+        if (!id) m.root.querySelector('#pSlug').value = slugify(e.target.value);
+      });
+      m.root.querySelector('#pSave').addEventListener('click', () => {
+        const data = {
+          id: p.id,
+          title: m.root.querySelector('#pTitle').value.trim(),
+          slug: m.root.querySelector('#pSlug').value.trim() || slugify(m.root.querySelector('#pTitle').value),
+          author: m.root.querySelector('#pAuthor').value.trim() || 'Admin',
+          category: m.root.querySelector('#pCat').value,
+          status: m.root.querySelector('#pStatus').value,
+          published: m.root.querySelector('#pPub').value,
+          excerpt: m.root.querySelector('#pExcerpt').value,
+          content: m.root.querySelector('#pContent').value
+        };
+        if (!data.title) { AdminUI.toast('Cần tiêu đề', 'error'); return; }
+        if (data.status === 'published' && !data.published) data.published = new Date().toISOString().slice(0,10);
+        if (id) Store.blog.update(id, data); else Store.blog.add(data);
+        AdminUI.toast('Đã lưu bài viết', 'success');
+        m.close(); render();
+      });
+    }
+  </script>
+</body>
+</html>

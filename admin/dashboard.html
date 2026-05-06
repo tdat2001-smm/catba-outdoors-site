@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tổng quan — Catba PMS</title>
+  <link rel="stylesheet" href="css/admin.css">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌊</text></svg>">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <div id="app-root"></div>
+  <script src="js/auth.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/layout.js"></script>
+  <script>
+    const session = AdminUI.renderLayout({
+      active: 'dashboard',
+      title: 'Tổng quan',
+      breadcrumb: 'Catba PMS / Tổng quan',
+      content: `
+        <div class="stat-grid" id="stats"></div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-head">
+              <h3>Doanh thu 12 tháng gần nhất</h3>
+              <span class="meta" id="revHint"></span>
+            </div>
+            <div class="card-body">
+              <div class="chart-wrap"><canvas id="revChart"></canvas></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head">
+              <h3>Trạng thái booking</h3>
+            </div>
+            <div class="card-body">
+              <div class="chart-wrap sm"><canvas id="statusChart"></canvas></div>
+            </div>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-head">
+              <h3>Top tour theo doanh thu</h3>
+              <span class="meta">12 tháng gần nhất</span>
+            </div>
+            <div class="card-body">
+              <ul class="bar-list" id="topTours"></ul>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head">
+              <h3>Booking gần đây</h3>
+              <a href="bookings.html" class="btn btn-secondary btn-sm">Xem tất cả</a>
+            </div>
+            <div class="card-body no-pad">
+              <div class="tbl-wrap">
+                <table class="tbl">
+                  <thead>
+                    <tr>
+                      <th>Mã</th><th>Khách</th><th>Tour</th><th>Ngày</th><th style="text-align:right">Tổng</th><th>Trạng thái</th>
+                    </tr>
+                  </thead>
+                  <tbody id="recentBookings"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      `
+    });
+
+    if (session) renderDashboard();
+
+    function renderDashboard() {
+      const bookings = Store.bookings.all();
+      const customers = Store.customers.all();
+      const payables = Store.payables.all();
+      const tours = Store.tours.all();
+
+      // ---- KPIs ----
+      const today = new Date('2026-05-06');
+      const thisMonth = today.toISOString().slice(0,7);
+      const monthBookings = bookings.filter((b) => b.date.startsWith(thisMonth));
+      const monthRevenue = monthBookings.filter((b) => b.status !== 'cancelled').reduce((s,b) => s + b.total, 0);
+      const lastMonth = (() => {
+        const d = new Date(today); d.setMonth(d.getMonth() - 1);
+        return d.toISOString().slice(0,7);
+      })();
+      const lastRevenue = bookings.filter((b) => b.date.startsWith(lastMonth) && b.status !== 'cancelled').reduce((s,b) => s + b.total, 0);
+      const delta = lastRevenue ? Math.round(((monthRevenue - lastRevenue) / lastRevenue) * 100) : 0;
+
+      const upcoming = bookings.filter((b) => b.date >= today.toISOString().slice(0,10) && b.status !== 'cancelled').length;
+      const overduePayables = payables.filter((p) => p.status === 'overdue').reduce((s,p) => s + (p.amount - p.paid), 0);
+      const totalReceivable = bookings.filter((b) => b.status !== 'cancelled').reduce((s,b) => s + (b.total - b.paid), 0);
+
+      const stats = [
+        { label: 'Doanh thu tháng này', value: Fmt.vnd(monthRevenue), delta: (delta >= 0 ? '+' : '') + delta + '% so với tháng trước', cls: '', icon: '💰', down: delta < 0 },
+        { label: 'Booking sắp tới', value: upcoming + ' đơn', delta: monthBookings.length + ' đơn trong tháng', cls: 'info', icon: '📅' },
+        { label: 'Khách hàng', value: Fmt.num(customers.length), delta: 'Đang hoạt động', cls: 'success', icon: '👥' },
+        { label: 'Công nợ phải trả quá hạn', value: Fmt.vnd(overduePayables), delta: 'Phải thu: ' + Fmt.vnd(totalReceivable), cls: 'danger', icon: '⚠️' }
+      ];
+
+      document.getElementById('stats').innerHTML = stats.map((s) => `
+        <div class="stat ${s.cls}">
+          <div class="meta">
+            <div class="label">${s.label}</div>
+            <div class="value">${s.value}</div>
+            <div class="delta ${s.down ? 'down' : ''}">${s.delta}</div>
+          </div>
+          <div class="icon"><span style="font-size:22px">${s.icon}</span></div>
+        </div>
+      `).join('');
+
+      // ---- 12 month chart ----
+      const months = [];
+      for (let i = 11; i >= 0; i--) {
+        const d = new Date(today); d.setMonth(d.getMonth() - i);
+        months.push(d.toISOString().slice(0,7));
+      }
+      const monthlyRevenue = months.map((m) => bookings.filter((b) => b.date.startsWith(m) && b.status !== 'cancelled').reduce((s,b) => s + b.total, 0));
+      document.getElementById('revHint').textContent = 'Tổng: ' + Fmt.vnd(monthlyRevenue.reduce((a,b) => a + b, 0));
+
+      new Chart(document.getElementById('revChart'), {
+        type: 'line',
+        data: {
+          labels: months.map((m) => m.slice(5) + '/' + m.slice(2,4)),
+          datasets: [{
+            label: 'Doanh thu (VND)',
+            data: monthlyRevenue,
+            borderColor: '#F5C518',
+            backgroundColor: 'rgba(245,197,24,0.15)',
+            fill: true,
+            tension: 0.35,
+            pointBackgroundColor: '#F5C518',
+            pointRadius: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => Fmt.vnd(c.raw) } } },
+          scales: { y: { ticks: { callback: (v) => (v / 1000000) + 'M' } } }
+        }
+      });
+
+      // ---- Status pie ----
+      const statusCount = bookings.reduce((acc, b) => { acc[b.status] = (acc[b.status] || 0) + 1; return acc; }, {});
+      const statusLabels = { confirmed: 'Đã xác nhận', pending: 'Chờ xử lý', completed: 'Hoàn tất', cancelled: 'Đã huỷ' };
+      const labels = Object.keys(statusCount);
+      new Chart(document.getElementById('statusChart'), {
+        type: 'doughnut',
+        data: {
+          labels: labels.map((l) => statusLabels[l] || l),
+          datasets: [{
+            data: labels.map((l) => statusCount[l]),
+            backgroundColor: ['#10b981','#f59e0b','#3b82f6','#ef4444']
+          }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+      });
+
+      // ---- Top tours ----
+      const byTour = {};
+      bookings.filter((b) => b.status !== 'cancelled').forEach((b) => {
+        if (!byTour[b.productId]) byTour[b.productId] = { id: b.productId, title: b.productTitle, total: 0 };
+        byTour[b.productId].total += b.total;
+      });
+      const topTours = Object.values(byTour).sort((a,b) => b.total - a.total).slice(0, 5);
+      const max = topTours[0] ? topTours[0].total : 1;
+      document.getElementById('topTours').innerHTML = topTours.map((t) => `
+        <li>
+          <span class="name">${t.title}</span>
+          <span class="val">${Fmt.vnd(t.total)}</span>
+          <div class="bar"><span style="width:${Math.round(t.total / max * 100)}%"></span></div>
+        </li>
+      `).join('');
+
+      // ---- Recent bookings ----
+      const recent = bookings.slice(0, 8);
+      document.getElementById('recentBookings').innerHTML = recent.map((b) => `
+        <tr>
+          <td>${b.id}</td>
+          <td>${AdminUI.escapeHtml(b.customerName)}</td>
+          <td>${AdminUI.escapeHtml(b.productTitle)}</td>
+          <td>${Fmt.date(b.date)}</td>
+          <td style="text-align:right;font-weight:600">${Fmt.vnd(b.total)}</td>
+          <td>${statusBadge(b.status)}</td>
+        </tr>
+      `).join('');
+    }
+
+    function statusBadge(s) {
+      const map = { confirmed: { c: 'success', t: 'Đã xác nhận' }, pending: { c: 'warning', t: 'Chờ xử lý' }, completed: { c: 'info', t: 'Hoàn tất' }, cancelled: { c: 'danger', t: 'Đã huỷ' } };
+      const m = map[s] || { c: 'muted', t: s };
+      return `<span class="badge ${m.c}">${m.t}</span>`;
+    }
+  </script>
+</body>
+</html>

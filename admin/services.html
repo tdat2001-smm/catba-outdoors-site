@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tour & Dịch vụ — Catba PMS</title>
+  <link rel="stylesheet" href="css/admin.css">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌊</text></svg>">
+  <style>
+    .tabs { display: flex; gap: .25rem; padding: 0 1.25rem; border-bottom: 1px solid var(--c-border); background: #fafbfc; border-radius: 10px 10px 0 0; }
+    .tab { padding: .8rem 1rem; font-weight: 600; color: var(--c-muted); border-bottom: 2px solid transparent; cursor: pointer; font-size: .88rem; }
+    .tab.active { color: var(--c-text); border-color: var(--c-accent); }
+  </style>
+</head>
+<body>
+  <div id="app-root"></div>
+  <script src="js/auth.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/layout.js"></script>
+  <script>
+    const session = AdminUI.renderLayout({
+      active: 'services',
+      title: 'Tour & Dịch vụ',
+      breadcrumb: 'Catba PMS / Nội dung / Tour & Dịch vụ',
+      content: `
+        <div class="card">
+          <div class="tabs">
+            <div class="tab active" data-tab="tours">Tours (${Store.tours.all().length})</div>
+            <div class="tab" data-tab="stays">Stays (${Store.stays.all().length})</div>
+          </div>
+          <div class="card-head" style="border-top:none">
+            <h3 id="paneTitle">Quản lý tours</h3>
+            <button class="btn btn-accent btn-sm" id="addBtn">+ Thêm</button>
+          </div>
+          <div class="card-body">
+            <div class="filter-bar">
+              <input type="text" id="search" class="search" placeholder="Tìm theo tên, địa điểm, mã...">
+              <select id="statusFilter">
+                <option value="">Tất cả trạng thái</option>
+                <option value="active">Đang bán</option>
+                <option value="inactive">Tạm ngừng</option>
+              </select>
+            </div>
+            <div class="tbl-wrap">
+              <table class="tbl" id="tbl"></table>
+            </div>
+          </div>
+        </div>
+      `
+    });
+
+    let activeTab = 'tours';
+
+    if (session) {
+      document.querySelectorAll('.tab').forEach((t) => t.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach((x) => x.classList.remove('active'));
+        t.classList.add('active');
+        activeTab = t.dataset.tab;
+        document.getElementById('paneTitle').textContent = activeTab === 'tours' ? 'Quản lý tours' : 'Quản lý stays';
+        render();
+      }));
+      ['search','statusFilter'].forEach((id) => document.getElementById(id).addEventListener('input', render));
+      document.getElementById('addBtn').addEventListener('click', () => editItem(null));
+      render();
+    }
+
+    function getList() {
+      const q = document.getElementById('search').value.trim().toLowerCase();
+      const status = document.getElementById('statusFilter').value;
+      const all = activeTab === 'tours' ? Store.tours.all() : Store.stays.all();
+      return all.filter((t) => {
+        if (q && !((t.title||'').toLowerCase().includes(q) || (t.location||'').toLowerCase().includes(q) || (t.id||'').toLowerCase().includes(q))) return false;
+        if (status && (t.status || 'active') !== status) return false;
+        return true;
+      });
+    }
+
+    function render() {
+      const tbl = document.getElementById('tbl');
+      const list = getList();
+      const head = activeTab === 'tours'
+        ? `<thead><tr><th>Mã</th><th>Tên tour</th><th>Địa điểm</th><th style="text-align:right">Giá VND</th><th style="text-align:right">Giá USD</th><th>Hiển thị</th><th>Trạng thái</th><th class="col-actions"></th></tr></thead>`
+        : `<thead><tr><th>Mã</th><th>Tên chỗ nghỉ</th><th>Địa điểm</th><th style="text-align:right">Giá từ (VND)</th><th>Trạng thái</th><th class="col-actions"></th></tr></thead>`;
+      const rows = list.length ? list.map((t) => activeTab === 'tours' ? `
+        <tr>
+          <td>${t.id}</td>
+          <td><strong>${AdminUI.escapeHtml(t.title)}</strong></td>
+          <td>${AdminUI.escapeHtml(t.location || '')}</td>
+          <td style="text-align:right;font-weight:600">${Fmt.vnd(t.priceVND)}</td>
+          <td style="text-align:right">$${t.price || 0}</td>
+          <td>${t.featured ? '<span class="badge info">Featured</span>' : '<span class="badge muted">Bình thường</span>'}</td>
+          <td>${(t.status || 'active') === 'active' ? '<span class="badge success">Đang bán</span>' : '<span class="badge warning">Tạm ngừng</span>'}</td>
+          <td class="col-actions">
+            <button class="btn btn-secondary btn-sm" data-edit="${t.id}">Sửa</button>
+            <button class="btn btn-danger btn-sm" data-del="${t.id}">Xoá</button>
+          </td>
+        </tr>
+      ` : `
+        <tr>
+          <td>${t.id}</td>
+          <td><strong>${AdminUI.escapeHtml(t.title)}</strong></td>
+          <td>${AdminUI.escapeHtml(t.location || '')}</td>
+          <td style="text-align:right;font-weight:600">${Fmt.vnd(t.priceFrom)}</td>
+          <td>${(t.status || 'active') === 'active' ? '<span class="badge success">Đang bán</span>' : '<span class="badge warning">Tạm ngừng</span>'}</td>
+          <td class="col-actions">
+            <button class="btn btn-secondary btn-sm" data-edit="${t.id}">Sửa</button>
+            <button class="btn btn-danger btn-sm" data-del="${t.id}">Xoá</button>
+          </td>
+        </tr>
+      `).join('') : `<tr><td colspan="8" class="tbl-empty">Không có dữ liệu</td></tr>`;
+      tbl.innerHTML = head + '<tbody>' + rows + '</tbody>';
+
+      tbl.querySelectorAll('button[data-edit]').forEach((b) => b.addEventListener('click', () => editItem(b.dataset.edit)));
+      tbl.querySelectorAll('button[data-del]').forEach((b) => b.addEventListener('click', () => {
+        if (!confirm('Xoá mục này?')) return;
+        const store = activeTab === 'tours' ? Store.tours : Store.stays;
+        store.remove(b.dataset.del); AdminUI.toast('Đã xoá', 'success'); render();
+      }));
+    }
+
+    function slugify(s) { return (s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/đ/g,'d').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,80); }
+
+    function editItem(id) {
+      const isTour = activeTab === 'tours';
+      const store = isTour ? Store.tours : Store.stays;
+      const all = store.all();
+      const t = id ? all.find((x) => x.id === id) : (isTour
+        ? { id: '', title: '', location: 'Lan Ha Bay', category: 'adventure', priceVND: 0, price: 0, status: 'active', featured: false }
+        : { id: '', title: '', location: 'Cat Ba Island', priceFrom: 0, status: 'active' });
+
+      const body = isTour ? `
+        <div class="form-grid">
+          <div class="form-row"><label>Mã (slug)</label><input id="fId" value="${AdminUI.escapeHtml(t.id)}" ${id ? 'readonly' : ''}></div>
+          <div class="form-row"><label>Địa điểm</label><input id="fLoc" value="${AdminUI.escapeHtml(t.location)}"></div>
+          <div class="form-row full"><label>Tiêu đề tour</label><input id="fTitle" value="${AdminUI.escapeHtml(t.title)}"></div>
+          <div class="form-row"><label>Giá VND / khách</label><input id="fPriceV" type="number" value="${t.priceVND || 0}"></div>
+          <div class="form-row"><label>Giá USD / khách</label><input id="fPriceU" type="number" value="${t.price || 0}"></div>
+          <div class="form-row"><label>Danh mục</label>
+            <select id="fCat">
+              ${['adventure','cruise','trekking','culture','food'].map((c) => `<option ${t.category===c?'selected':''}>${c}</option>`).join('')}
+            </select>
+          </div>
+          <div class="form-row"><label>Trạng thái</label>
+            <select id="fStatus">
+              <option value="active" ${t.status==='active'?'selected':''}>Đang bán</option>
+              <option value="inactive" ${t.status==='inactive'?'selected':''}>Tạm ngừng</option>
+            </select>
+          </div>
+          <div class="form-row full"><label><input id="fFeat" type="checkbox" ${t.featured?'checked':''}> Hiển thị nổi bật trên trang chủ</label></div>
+        </div>
+      ` : `
+        <div class="form-grid">
+          <div class="form-row"><label>Mã (slug)</label><input id="fId" value="${AdminUI.escapeHtml(t.id)}" ${id ? 'readonly' : ''}></div>
+          <div class="form-row"><label>Địa điểm</label><input id="fLoc" value="${AdminUI.escapeHtml(t.location)}"></div>
+          <div class="form-row full"><label>Tên chỗ nghỉ</label><input id="fTitle" value="${AdminUI.escapeHtml(t.title)}"></div>
+          <div class="form-row"><label>Giá từ (VND / đêm)</label><input id="fPriceFrom" type="number" value="${t.priceFrom || 0}"></div>
+          <div class="form-row"><label>Trạng thái</label>
+            <select id="fStatus">
+              <option value="active" ${t.status==='active'?'selected':''}>Đang bán</option>
+              <option value="inactive" ${t.status==='inactive'?'selected':''}>Tạm ngừng</option>
+            </select>
+          </div>
+        </div>
+      `;
+      const footer = `<button class="btn btn-secondary" id="fCancel">Huỷ</button><button class="btn btn-accent" id="fSave">Lưu</button>`;
+      const m = AdminUI.openModal({ title: (id ? 'Sửa ' : 'Thêm ') + (isTour ? 'tour' : 'chỗ nghỉ'), body, footer });
+      m.root.querySelector('#fCancel').addEventListener('click', m.close);
+      const titleInput = m.root.querySelector('#fTitle');
+      titleInput.addEventListener('input', () => { if (!id) m.root.querySelector('#fId').value = slugify(titleInput.value); });
+      m.root.querySelector('#fSave').addEventListener('click', () => {
+        const idVal = m.root.querySelector('#fId').value.trim() || slugify(titleInput.value);
+        const data = isTour ? {
+          id: idVal,
+          title: m.root.querySelector('#fTitle').value.trim(),
+          location: m.root.querySelector('#fLoc').value.trim(),
+          category: m.root.querySelector('#fCat').value,
+          priceVND: Number(m.root.querySelector('#fPriceV').value) || 0,
+          price: Number(m.root.querySelector('#fPriceU').value) || 0,
+          status: m.root.querySelector('#fStatus').value,
+          featured: m.root.querySelector('#fFeat').checked
+        } : {
+          id: idVal,
+          title: m.root.querySelector('#fTitle').value.trim(),
+          location: m.root.querySelector('#fLoc').value.trim(),
+          priceFrom: Number(m.root.querySelector('#fPriceFrom').value) || 0,
+          status: m.root.querySelector('#fStatus').value
+        };
+        if (!data.title || !data.id) { AdminUI.toast('Thiếu tên hoặc mã', 'error'); return; }
+        if (id) store.update(id, data); else store.add(data);
+        AdminUI.toast('Đã lưu', 'success');
+        m.close(); render();
+      });
+    }
+  </script>
+</body>
+</html>
