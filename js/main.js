@@ -179,11 +179,34 @@ document.addEventListener('click', (e) => {
   }
 });
 
-/* -- Load tours from JSON -- */
+/* -- Merge admin localStorage overrides with original JSON -- */
+function mergeAdminOverrides(table, jsonData) {
+  try {
+    const raw = localStorage.getItem('cbo_admin_' + table);
+    if (!raw) return jsonData;
+    const overrides = JSON.parse(raw);
+    if (!Array.isArray(overrides) || !overrides.length) return jsonData;
+    const map = {};
+    jsonData.forEach((j) => { map[j.id] = j; });
+    overrides.forEach((o) => {
+      if (!o || !o.id) return;
+      // skip inactive items so public site hides them
+      if (o.status === 'inactive') { delete map[o.id]; return; }
+      // merge: JSON as base, override fields take priority
+      map[o.id] = Object.assign({}, map[o.id] || {}, o);
+    });
+    return Object.values(map);
+  } catch (_) {
+    return jsonData;
+  }
+}
+
+/* -- Load tours from JSON (with admin overrides) -- */
 async function loadTours(containerId, options = {}) {
   try {
     const res = await fetch('/data/tours.json');
-    const tours = await res.json();
+    const json = await res.json();
+    const tours = mergeAdminOverrides('tours', json);
 
     const container = document.getElementById(containerId);
     if (!container) return;
@@ -253,7 +276,8 @@ async function loadTourDetail() {
 
   try {
     const res = await fetch('/data/tours.json');
-    const tours = await res.json();
+    const json = await res.json();
+    const tours = mergeAdminOverrides('tours', json);
     const tour = tours.find(t => t.id === tourId);
 
     if (!tour) {
@@ -420,4 +444,84 @@ function handleSearch() {
   } else {
     window.location.href = 'tours.html?' + params.toString();
   }
+}
+
+/* -- Load stays from JSON (with admin overrides) -- */
+async function loadStays(containerId) {
+  try {
+    const res = await fetch('/data/stays.json');
+    const json = await res.json();
+    const stays = mergeAdminOverrides('stays', json);
+
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    container.innerHTML = stays.map(stayCardHTML).join('');
+    initFadeIn();
+  } catch (err) {
+    console.error('Error loading stays:', err);
+  }
+}
+
+function stayCardHTML(s) {
+  const features = (s.features || []).map((f) => `<li>${f}</li>`).join('');
+  const priceLabel = s.priceFrom ? `From ${Number(s.priceFrom).toLocaleString('vi-VN')} VND <small>/ night</small>` : '';
+  const link = s.link && s.link !== '#' ? `<a href="${s.link}" class="btn btn-primary" target="_blank">Visit Website</a>` : `<a href="contact.html" class="btn btn-primary">Book Now</a>`;
+  return `
+    <section class="section" id="${s.id}">
+      <div class="container">
+        <div class="stay-card fade-in" style="box-shadow:none;border:1px solid var(--color-gray-200);">
+          <div class="stay-card-img img-placeholder" style="min-height:450px;${s.image ? `background-image:url('${s.image}');background-size:cover;background-position:center;` : ''}">${s.image ? '' : 'Photo: ' + (s.title || '')}</div>
+          <div class="stay-card-body" style="padding:3.5rem;">
+            ${s.subtitle ? `<div class="card-tag">${s.subtitle}</div>` : ''}
+            <h2 style="margin-bottom:1rem;">${s.title || ''}</h2>
+            ${s.description ? `<p style="line-height:1.8;margin-bottom:1.5rem;">${s.description}</p>` : ''}
+            ${features ? `<h4 style="margin-top:2rem;margin-bottom:1rem;">What's here</h4><ul class="stay-features" style="margin-bottom:2rem;">${features}</ul>` : ''}
+            <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:center;">
+              ${priceLabel ? `<span class="card-price">${priceLabel}</span>` : ''}
+              ${link}
+              <a href="contact.html" class="btn btn-dark">Inquire</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+/* -- Load blog posts from admin store (localStorage) -- */
+function loadBlog(containerId) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  let posts = [];
+  try {
+    const raw = localStorage.getItem('cbo_admin_blog');
+    if (raw) posts = JSON.parse(raw);
+  } catch (_) {}
+  posts = (posts || []).filter((p) => p.status === 'published').sort((a,b) => (b.published || '').localeCompare(a.published || ''));
+  if (!posts.length) {
+    container.innerHTML = '<p class="text-muted" style="grid-column:1/-1;text-align:center;padding:2rem">No posts published yet.</p>';
+    return;
+  }
+  container.innerHTML = posts.map(blogCardHTML).join('');
+  initFadeIn();
+}
+
+function blogCardHTML(p) {
+  const dateStr = p.published ? new Date(p.published).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : '';
+  const readMin = Math.max(2, Math.round((p.content || '').split(/\s+/).length / 220));
+  return `
+    <div class="card blog-card fade-in">
+      <div class="card-img img-placeholder">${p.image ? `<img src="${p.image}" alt="${p.title}" style="width:100%;height:100%;object-fit:cover">` : 'Photo: ' + p.category}</div>
+      <div class="card-body">
+        <div class="card-tag">${p.category || ''}</div>
+        <h4 class="card-title">${p.title || ''}</h4>
+        <p class="card-text">${p.excerpt || ''}</p>
+        <div class="card-meta">
+          <span>${dateStr}</span>
+          ${dateStr ? '<span>&bull;</span>' : ''}
+          <span>${readMin} min read</span>
+        </div>
+      </div>
+    </div>
+  `;
 }

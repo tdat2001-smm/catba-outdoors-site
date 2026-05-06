@@ -39,94 +39,7 @@
 
   <section class="section">
     <div class="container">
-      <div class="grid grid-3">
-
-        <div class="card blog-card fade-in">
-          <div class="card-img img-placeholder">Photo: Lan Ha Bay</div>
-          <div class="card-body">
-            <div class="card-tag">Travel Guide</div>
-            <h4 class="card-title">How to Get to Cat Ba Island: Complete Guide 2026</h4>
-            <p class="card-text">Everything you need to know about getting to Cat Ba — from Hanoi, Hai Phong, and beyond. Routes, ferry schedules, and tips.</p>
-            <div class="card-meta">
-              <span>April 2026</span>
-              <span>&bull;</span>
-              <span>5 min read</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="card blog-card fade-in">
-          <div class="card-img img-placeholder">Photo: Kayaking</div>
-          <div class="card-body">
-            <div class="card-tag">Adventure</div>
-            <h4 class="card-title">Top 5 Kayaking Routes in Lan Ha Bay</h4>
-            <p class="card-text">Discover the best kayaking routes through limestone karsts, hidden lagoons, and floating villages in Lan Ha Bay.</p>
-            <div class="card-meta">
-              <span>March 2026</span>
-              <span>&bull;</span>
-              <span>4 min read</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="card blog-card fade-in">
-          <div class="card-img img-placeholder">Photo: Seafood</div>
-          <div class="card-body">
-            <div class="card-tag">Food</div>
-            <h4 class="card-title">Cat Ba Seafood: What to Eat and Where</h4>
-            <p class="card-text">A food lover's guide to the freshest seafood on Cat Ba Island. From floating restaurants to street-side grills.</p>
-            <div class="card-meta">
-              <span>February 2026</span>
-              <span>&bull;</span>
-              <span>6 min read</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="card blog-card fade-in">
-          <div class="card-img img-placeholder">Photo: National Park</div>
-          <div class="card-body">
-            <div class="card-tag">Nature</div>
-            <h4 class="card-title">Cat Ba National Park: Hiking Trails Guide</h4>
-            <p class="card-text">Explore the trails of Cat Ba National Park — from easy walks to challenging treks with panoramic bay views.</p>
-            <div class="card-meta">
-              <span>January 2026</span>
-              <span>&bull;</span>
-              <span>7 min read</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="card blog-card fade-in">
-          <div class="card-img img-placeholder">Photo: Sunset</div>
-          <div class="card-body">
-            <div class="card-tag">Experience</div>
-            <h4 class="card-title">Why You Should Stay in a Floating House</h4>
-            <p class="card-text">Wake up on the water, fish for breakfast, and kayak through karst mountains. Here's what a night on Lan Ha Bay is really like.</p>
-            <div class="card-meta">
-              <span>December 2025</span>
-              <span>&bull;</span>
-              <span>5 min read</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="card blog-card fade-in">
-          <div class="card-img img-placeholder">Photo: Healing Camp</div>
-          <div class="card-body">
-            <div class="card-tag">Wellness</div>
-            <h4 class="card-title">The Art of Slowing Down: Life at The Healing Camp</h4>
-            <p class="card-text">What happens when you trade your screen for the sea? A guest's reflection on staying at our seaside camp.</p>
-            <div class="card-meta">
-              <span>November 2025</span>
-              <span>&bull;</span>
-              <span>4 min read</span>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
+      <div class="grid grid-3" id="blogList"></div>
       <div class="text-center mt-4">
         <p class="text-muted">More articles coming soon. Follow us on social media for updates.</p>
       </div>
@@ -161,5 +74,6 @@
   </footer>
 
   <script src="js/main.js"></script>
+  <script>loadBlog('blogList');</script>
 </body>
 </html>

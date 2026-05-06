@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doanh thu — Catba PMS</title>
+  <link rel="stylesheet" href="css/admin.css">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌊</text></svg>">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <div id="app-root"></div>
+  <script src="js/auth.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/layout.js"></script>
+  <script>
+    const session = AdminUI.renderLayout({
+      active: 'revenue',
+      title: 'Doanh thu',
+      breadcrumb: 'Catba PMS / Tài chính / Doanh thu',
+      content: `
+        <div class="filter-bar" style="margin-bottom:1rem">
+          <select id="period">
+            <option value="12">12 tháng gần nhất</option>
+            <option value="6">6 tháng gần nhất</option>
+            <option value="3">3 tháng gần nhất</option>
+            <option value="ytd">Từ đầu năm (YTD)</option>
+          </select>
+        </div>
+        <div class="stat-grid" id="rStats"></div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-head"><h3>Doanh thu theo tháng</h3></div>
+            <div class="card-body"><div class="chart-wrap"><canvas id="rChart"></canvas></div></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h3>Doanh thu theo kênh</h3></div>
+            <div class="card-body"><div class="chart-wrap"><canvas id="cChart"></canvas></div></div>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-head"><h3>Doanh thu theo tour</h3></div>
+            <div class="card-body"><ul class="bar-list" id="byTour"></ul></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h3>Phải thu (chưa thanh toán đủ)</h3></div>
+            <div class="card-body no-pad">
+              <div class="tbl-wrap">
+                <table class="tbl">
+                  <thead><tr><th>Booking</th><th>Khách</th><th>Ngày</th><th style="text-align:right">Còn lại</th><th>Trạng thái</th></tr></thead>
+                  <tbody id="receivablesBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      `
+    });
+
+    let rChart, cChart;
+    if (session) { document.getElementById('period').addEventListener('change', render); render(); }
+
+    function getMonths(period) {
+      const today = new Date('2026-05-06');
+      let count = 12;
+      if (period === '6') count = 6;
+      if (period === '3') count = 3;
+      if (period === 'ytd') count = today.getMonth() + 1;
+      const months = [];
+      for (let i = count - 1; i >= 0; i--) {
+        const d = new Date(today); d.setMonth(d.getMonth() - i);
+        months.push(d.toISOString().slice(0,7));
+      }
+      return months;
+    }
+
+    function render() {
+      const period = document.getElementById('period').value;
+      const months = getMonths(period);
+      const all = Store.bookings.all().filter((b) => b.status !== 'cancelled');
+      const inRange = all.filter((b) => months.some((m) => b.date.startsWith(m)));
+
+      const totalRevenue = inRange.reduce((s,b) => s + b.total, 0);
+      const totalPaid = inRange.reduce((s,b) => s + b.paid, 0);
+      const receivable = totalRevenue - totalPaid;
+      const ordersCount = inRange.length;
+
+      const stats = [
+        { label: 'Doanh thu', value: Fmt.vnd(totalRevenue), cls: '', icon: '💰' },
+        { label: 'Đã thu', value: Fmt.vnd(totalPaid), cls: 'success', icon: '✅' },
+        { label: 'Phải thu', value: Fmt.vnd(receivable), cls: 'danger', icon: '⏳' },
+        { label: 'Số đơn', value: Fmt.num(ordersCount), cls: 'info', icon: '🧾' }
+      ];
+      document.getElementById('rStats').innerHTML = stats.map((s) => `
+        <div class="stat ${s.cls}">
+          <div class="meta"><div class="label">${s.label}</div><div class="value">${s.value}</div></div>
+          <div class="icon"><span style="font-size:22px">${s.icon}</span></div>
+        </div>
+      `).join('');
+
+      const monthRevenue = months.map((m) => inRange.filter((b) => b.date.startsWith(m)).reduce((s,b) => s + b.total, 0));
+      const monthPaid    = months.map((m) => inRange.filter((b) => b.date.startsWith(m)).reduce((s,b) => s + b.paid, 0));
+
+      if (rChart) rChart.destroy();
+      rChart = new Chart(document.getElementById('rChart'), {
+        type: 'bar',
+        data: {
+          labels: months.map((m) => m.slice(5) + '/' + m.slice(2,4)),
+          datasets: [
+            { label: 'Doanh thu', data: monthRevenue, backgroundColor: '#F5C518' },
+            { label: 'Đã thu',    data: monthPaid,    backgroundColor: '#10b981' }
+          ]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { label: (c) => c.dataset.label + ': ' + Fmt.vnd(c.raw) } } },
+          scales: { y: { ticks: { callback: (v) => (v / 1000000) + 'M' } } }
+        }
+      });
+
+      const byChannel = {};
+      inRange.forEach((b) => byChannel[b.channel] = (byChannel[b.channel] || 0) + b.total);
+      const channels = Object.keys(byChannel);
+
+      if (cChart) cChart.destroy();
+      cChart = new Chart(document.getElementById('cChart'), {
+        type: 'doughnut',
+        data: {
+          labels: channels,
+          datasets: [{ data: channels.map((c) => byChannel[c]), backgroundColor: ['#F5C518','#10b981','#3b82f6','#ef4444','#a855f7','#0ea5e9'] }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { label: (c) => c.label + ': ' + Fmt.vnd(c.raw) } } } }
+      });
+
+      const byTour = {};
+      inRange.forEach((b) => {
+        if (!byTour[b.productId]) byTour[b.productId] = { title: b.productTitle, total: 0 };
+        byTour[b.productId].total += b.total;
+      });
+      const list = Object.values(byTour).sort((a,b) => b.total - a.total);
+      const max = list[0] ? list[0].total : 1;
+      document.getElementById('byTour').innerHTML = list.map((t) => `
+        <li>
+          <span class="name">${AdminUI.escapeHtml(t.title)}</span>
+          <span class="val">${Fmt.vnd(t.total)}</span>
+          <div class="bar"><span style="width:${Math.round(t.total / max * 100)}%"></span></div>
+        </li>
+      `).join('') || '<li class="empty">Chưa có dữ liệu</li>';
+
+      const receivables = inRange.filter((b) => b.paid < b.total).sort((a,b) => (b.total - b.paid) - (a.total - a.paid)).slice(0, 15);
+      document.getElementById('receivablesBody').innerHTML = receivables.length ? receivables.map((b) => `
+        <tr>
+          <td>${b.id}</td>
+          <td>${AdminUI.escapeHtml(b.customerName)}</td>
+          <td>${Fmt.date(b.date)}</td>
+          <td style="text-align:right;font-weight:600;color:var(--c-danger)">${Fmt.vnd(b.total - b.paid)}</td>
+          <td><span class="badge ${badgeCls(b.status)}">${b.status}</span></td>
+        </tr>
+      `).join('') : '<tr><td colspan="5" class="tbl-empty">Đã thu đủ</td></tr>';
+    }
+
+    function badgeCls(s) {
+      return ({ confirmed: 'success', pending: 'warning', completed: 'info', cancelled: 'danger' })[s] || 'muted';
+    }
+  </script>
+</body>
+</html>

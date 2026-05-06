@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đặt dịch vụ — Catba PMS</title>
+  <link rel="stylesheet" href="css/admin.css">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌊</text></svg>">
+</head>
+<body>
+  <div id="app-root"></div>
+  <script src="js/auth.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/layout.js"></script>
+  <script>
+    const session = AdminUI.renderLayout({
+      active: 'bookings',
+      title: 'Đặt dịch vụ',
+      breadcrumb: 'Catba PMS / Đặt dịch vụ',
+      content: `
+        <div class="stat-grid" id="bkStats"></div>
+        <div class="card">
+          <div class="card-head">
+            <h3>Danh sách booking</h3>
+            <div style="display:flex; gap:.4rem">
+              <button class="btn btn-secondary btn-sm" id="exportBtn">Xuất CSV</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="filter-bar">
+              <input type="text" id="search" class="search" placeholder="Tìm theo khách, mã, tour...">
+              <select id="statusFilter">
+                <option value="">Tất cả trạng thái</option>
+                <option value="confirmed">Đã xác nhận</option>
+                <option value="pending">Chờ xử lý</option>
+                <option value="completed">Hoàn tất</option>
+                <option value="cancelled">Đã huỷ</option>
+              </select>
+              <select id="channelFilter">
+                <option value="">Tất cả kênh</option>
+              </select>
+              <input type="date" id="fromDate">
+              <input type="date" id="toDate">
+            </div>
+            <div class="tbl-wrap">
+              <table class="tbl">
+                <thead>
+                  <tr>
+                    <th>Mã</th><th>Khách hàng</th><th>Tour / Dịch vụ</th><th>Ngày đi</th>
+                    <th style="text-align:center">Khách</th><th>Kênh</th>
+                    <th style="text-align:right">Tổng</th><th style="text-align:right">Đã thanh toán</th>
+                    <th>Trạng thái</th><th class="col-actions"></th>
+                  </tr>
+                </thead>
+                <tbody id="bkBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      `
+    });
+
+    if (session) init();
+
+    function init() {
+      const channels = Array.from(new Set(Store.bookings.all().map((b) => b.channel)));
+      const cf = document.getElementById('channelFilter');
+      channels.forEach((c) => { const o = document.createElement('option'); o.value = c; o.textContent = c; cf.appendChild(o); });
+
+      ['search','statusFilter','channelFilter','fromDate','toDate'].forEach((id) => {
+        document.getElementById(id).addEventListener('input', render);
+      });
+      document.getElementById('exportBtn').addEventListener('click', exportCsv);
+      render();
+    }
+
+    function getFiltered() {
+      const q = document.getElementById('search').value.trim().toLowerCase();
+      const s = document.getElementById('statusFilter').value;
+      const c = document.getElementById('channelFilter').value;
+      const f = document.getElementById('fromDate').value;
+      const t = document.getElementById('toDate').value;
+      return Store.bookings.all().filter((b) => {
+        if (q && !(b.id.toLowerCase().includes(q) || b.customerName.toLowerCase().includes(q) || b.productTitle.toLowerCase().includes(q))) return false;
+        if (s && b.status !== s) return false;
+        if (c && b.channel !== c) return false;
+        if (f && b.date < f) return false;
+        if (t && b.date > t) return false;
+        return true;
+      });
+    }
+
+    function render() {
+      const list = getFiltered();
+      const stats = [
+        { label: 'Số booking', value: Fmt.num(list.length), cls: 'info', icon: '🧾' },
+        { label: 'Tổng giá trị', value: Fmt.vnd(list.reduce((s,b) => s + b.total, 0)), cls: '', icon: '💰' },
+        { label: 'Đã thu', value: Fmt.vnd(list.reduce((s,b) => s + b.paid, 0)), cls: 'success', icon: '✅' },
+        { label: 'Còn phải thu', value: Fmt.vnd(list.reduce((s,b) => s + (b.total - b.paid), 0)), cls: 'danger', icon: '⏳' }
+      ];
+      document.getElementById('bkStats').innerHTML = stats.map((s) => `
+        <div class="stat ${s.cls}">
+          <div class="meta"><div class="label">${s.label}</div><div class="value">${s.value}</div></div>
+          <div class="icon"><span style="font-size:22px">${s.icon}</span></div>
+        </div>
+      `).join('');
+
+      const tbody = document.getElementById('bkBody');
+      if (!list.length) { tbody.innerHTML = '<tr><td colspan="10" class="tbl-empty">Không có booking phù hợp</td></tr>'; return; }
+      tbody.innerHTML = list.map((b) => `
+        <tr>
+          <td><strong>${b.id}</strong></td>
+          <td>
+            <div style="font-weight:600">${AdminUI.escapeHtml(b.customerName)}</div>
+            <div style="color:var(--c-muted);font-size:.78rem">${AdminUI.escapeHtml(b.email)}</div>
+          </td>
+          <td>${AdminUI.escapeHtml(b.productTitle)}</td>
+          <td>${Fmt.date(b.date)}</td>
+          <td style="text-align:center">${b.guests}</td>
+          <td>${AdminUI.escapeHtml(b.channel)}</td>
+          <td style="text-align:right;font-weight:600">${Fmt.vnd(b.total)}</td>
+          <td style="text-align:right">${Fmt.vnd(b.paid)}</td>
+          <td>${statusBadge(b.status)}</td>
+          <td class="col-actions">
+            <button class="btn btn-secondary btn-sm" data-view="${b.id}">Xem</button>
+          </td>
+        </tr>
+      `).join('');
+      tbody.querySelectorAll('button[data-view]').forEach((btn) => {
+        btn.addEventListener('click', () => openBooking(btn.dataset.view));
+      });
+    }
+
+    function openBooking(id) {
+      const b = Store.bookings.all().find((x) => x.id === id);
+      if (!b) return;
+      const body = `
+        <div class="form-grid">
+          <div><label>Mã booking</label><div style="font-weight:600">${b.id}</div></div>
+          <div><label>Tour / Dịch vụ</label><div>${AdminUI.escapeHtml(b.productTitle)}</div></div>
+          <div><label>Khách hàng</label><div>${AdminUI.escapeHtml(b.customerName)}</div></div>
+          <div><label>Email</label><div>${AdminUI.escapeHtml(b.email)}</div></div>
+          <div><label>Điện thoại</label><div>${AdminUI.escapeHtml(b.phone)}</div></div>
+          <div><label>Ngày đi</label><div>${Fmt.date(b.date)}</div></div>
+          <div><label>Số khách</label><div>${b.guests}</div></div>
+          <div><label>Kênh đặt</label><div>${AdminUI.escapeHtml(b.channel)}</div></div>
+          <div class="form-row"><label>Tổng tiền</label><input id="bkTotal" type="number" value="${b.total}"></div>
+          <div class="form-row"><label>Đã thanh toán</label><input id="bkPaid" type="number" value="${b.paid}"></div>
+          <div class="form-row full"><label>Trạng thái</label>
+            <select id="bkStatus">
+              <option value="confirmed" ${b.status==='confirmed'?'selected':''}>Đã xác nhận</option>
+              <option value="pending"   ${b.status==='pending'?'selected':''}>Chờ xử lý</option>
+              <option value="completed" ${b.status==='completed'?'selected':''}>Hoàn tất</option>
+              <option value="cancelled" ${b.status==='cancelled'?'selected':''}>Đã huỷ</option>
+            </select>
+          </div>
+        </div>
+      `;
+      const footer = `
+        <button class="btn btn-danger btn-sm" id="bkDel">Xoá booking</button>
+        <span style="flex:1"></span>
+        <button class="btn btn-secondary" id="bkCancel">Đóng</button>
+        <button class="btn btn-accent" id="bkSave">Lưu thay đổi</button>
+      `;
+      const m = AdminUI.openModal({ title: 'Booking ' + b.id, body, footer });
+      m.root.querySelector('#bkCancel').addEventListener('click', m.close);
+      m.root.querySelector('#bkSave').addEventListener('click', () => {
+        Store.bookings.update(b.id, {
+          total: Number(m.root.querySelector('#bkTotal').value) || 0,
+          paid: Number(m.root.querySelector('#bkPaid').value) || 0,
+          status: m.root.querySelector('#bkStatus').value
+        });
+        AdminUI.toast('Đã lưu booking', 'success');
+        m.close();
+        render();
+      });
+      m.root.querySelector('#bkDel').addEventListener('click', () => {
+        if (!confirm('Xoá booking ' + b.id + '?')) return;
+        Store.bookings.remove(b.id);
+        AdminUI.toast('Đã xoá', 'success');
+        m.close();
+        render();
+      });
+    }
+
+    function statusBadge(s) {
+      const map = { confirmed: { c: 'success', t: 'Đã xác nhận' }, pending: { c: 'warning', t: 'Chờ xử lý' }, completed: { c: 'info', t: 'Hoàn tất' }, cancelled: { c: 'danger', t: 'Đã huỷ' } };
+      const m = map[s] || { c: 'muted', t: s };
+      return `<span class="badge ${m.c}">${m.t}</span>`;
+    }
+
+    function exportCsv() {
+      const list = getFiltered();
+      const header = ['ID','Date','Customer','Email','Phone','Tour','Guests','Channel','Total','Paid','Status'];
+      const rows = list.map((b) => [b.id, b.date, b.customerName, b.email, b.phone, b.productTitle, b.guests, b.channel, b.total, b.paid, b.status]);
+      const csv = [header, ...rows].map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'bookings.csv'; a.click();
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</body>
+</html>

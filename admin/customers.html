@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Khách hàng — Catba PMS</title>
+  <link rel="stylesheet" href="css/admin.css">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌊</text></svg>">
+</head>
+<body>
+  <div id="app-root"></div>
+  <script src="js/auth.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/layout.js"></script>
+  <script>
+    const session = AdminUI.renderLayout({
+      active: 'customers',
+      title: 'Khách hàng',
+      breadcrumb: 'Catba PMS / Khách hàng',
+      content: `
+        <div class="stat-grid" id="cStats"></div>
+        <div class="card">
+          <div class="card-head">
+            <h3>Danh sách khách hàng</h3>
+            <button class="btn btn-secondary btn-sm" id="exportBtn">Xuất CSV</button>
+          </div>
+          <div class="card-body">
+            <div class="filter-bar">
+              <input type="text" id="search" class="search" placeholder="Tìm theo tên, email, SĐT, mã KH...">
+              <select id="countryFilter"><option value="">Tất cả quốc gia</option></select>
+            </div>
+            <div class="tbl-wrap">
+              <table class="tbl">
+                <thead>
+                  <tr>
+                    <th>Mã</th><th>Khách hàng</th><th>Liên hệ</th><th>Quốc gia</th>
+                    <th style="text-align:center">Số booking</th>
+                    <th style="text-align:right">Tổng chi tiêu</th>
+                    <th>Tham gia</th><th class="col-actions"></th>
+                  </tr>
+                </thead>
+                <tbody id="cBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      `
+    });
+
+    if (session) init();
+
+    function init() {
+      const countries = Array.from(new Set(Store.customers.all().map((c) => c.country)));
+      const cf = document.getElementById('countryFilter');
+      countries.forEach((c) => { const o = document.createElement('option'); o.value = c; o.textContent = c; cf.appendChild(o); });
+
+      ['search','countryFilter'].forEach((id) => document.getElementById(id).addEventListener('input', render));
+      document.getElementById('exportBtn').addEventListener('click', exportCsv);
+      render();
+    }
+
+    function getFiltered() {
+      const q = document.getElementById('search').value.trim().toLowerCase();
+      const country = document.getElementById('countryFilter').value;
+      return Store.customers.all().filter((c) => {
+        if (country && c.country !== country) return false;
+        if (q && !(c.id.toLowerCase().includes(q) || c.name.toLowerCase().includes(q) || c.email.toLowerCase().includes(q) || c.phone.toLowerCase().includes(q))) return false;
+        return true;
+      });
+    }
+
+    function render() {
+      const list = getFiltered();
+      const all = Store.customers.all();
+      const totalSpent = all.reduce((s,c) => s + c.totalSpent, 0);
+      const repeaters = all.filter((c) => c.bookings >= 2).length;
+
+      const stats = [
+        { label: 'Tổng khách hàng', value: Fmt.num(all.length), cls: 'info', icon: '👥' },
+        { label: 'Khách quay lại', value: Fmt.num(repeaters), cls: 'success', icon: '💚' },
+        { label: 'Tổng chi tiêu', value: Fmt.vnd(totalSpent), cls: '', icon: '💰' },
+        { label: 'Chi tiêu TB / khách', value: Fmt.vnd(all.length ? totalSpent / all.length : 0), cls: 'info', icon: '📊' }
+      ];
+      document.getElementById('cStats').innerHTML = stats.map((s) => `
+        <div class="stat ${s.cls}">
+          <div class="meta"><div class="label">${s.label}</div><div class="value">${s.value}</div></div>
+          <div class="icon"><span style="font-size:22px">${s.icon}</span></div>
+        </div>
+      `).join('');
+
+      const tbody = document.getElementById('cBody');
+      if (!list.length) { tbody.innerHTML = '<tr><td colspan="8" class="tbl-empty">Không có khách hàng phù hợp</td></tr>'; return; }
+      tbody.innerHTML = list.map((c) => `
+        <tr>
+          <td><strong>${c.id}</strong></td>
+          <td>
+            <div style="display:flex; align-items:center; gap:.6rem">
+              <div style="width:36px;height:36px;border-radius:50%;background:#fef3c7;color:#92400e;display:grid;place-items:center;font-weight:700;font-size:.8rem">${c.name.split(' ').slice(-2).map(p => p[0]).join('').toUpperCase()}</div>
+              <div><div style="font-weight:600">${AdminUI.escapeHtml(c.name)}</div></div>
+            </div>
+          </td>
+          <td>
+            <div style="font-size:.82rem">${AdminUI.escapeHtml(c.email)}</div>
+            <div style="font-size:.78rem;color:var(--c-muted)">${AdminUI.escapeHtml(c.phone)}</div>
+          </td>
+          <td>${AdminUI.escapeHtml(c.country)}</td>
+          <td style="text-align:center"><span class="badge info">${c.bookings}</span></td>
+          <td style="text-align:right;font-weight:600">${Fmt.vnd(c.totalSpent)}</td>
+          <td>${Fmt.date(c.joined)}</td>
+          <td class="col-actions"><button class="btn btn-secondary btn-sm" data-view="${c.id}">Chi tiết</button></td>
+        </tr>
+      `).join('');
+      tbody.querySelectorAll('button[data-view]').forEach((btn) => btn.addEventListener('click', () => openCustomer(btn.dataset.view)));
+    }
+
+    function openCustomer(id) {
+      const c = Store.customers.get(id);
+      if (!c) return;
+      const bookings = Store.bookings.all().filter((b) => b.customerId === id);
+      const body = `
+        <div class="form-grid">
+          <div><label>Mã KH</label><div style="font-weight:600">${c.id}</div></div>
+          <div><label>Quốc gia</label><div>${AdminUI.escapeHtml(c.country)}</div></div>
+          <div class="full"><label>Họ tên</label><div style="font-size:1.1rem;font-weight:600">${AdminUI.escapeHtml(c.name)}</div></div>
+          <div><label>Email</label><div>${AdminUI.escapeHtml(c.email)}</div></div>
+          <div><label>Điện thoại</label><div>${AdminUI.escapeHtml(c.phone)}</div></div>
+          <div><label>Số booking</label><div>${c.bookings}</div></div>
+          <div><label>Tổng chi tiêu</label><div style="font-weight:600">${Fmt.vnd(c.totalSpent)}</div></div>
+        </div>
+        <div style="margin-top:1.25rem">
+          <h4 style="font-size:.9rem; font-weight:600; margin-bottom:.6rem">Lịch sử booking (${bookings.length})</h4>
+          <div class="tbl-wrap" style="border:1px solid var(--c-border);border-radius:8px">
+            <table class="tbl">
+              <thead><tr><th>Mã</th><th>Tour</th><th>Ngày</th><th style="text-align:right">Tổng</th><th>Trạng thái</th></tr></thead>
+              <tbody>
+                ${bookings.length ? bookings.map((b) => `
+                  <tr>
+                    <td>${b.id}</td>
+                    <td>${AdminUI.escapeHtml(b.productTitle)}</td>
+                    <td>${Fmt.date(b.date)}</td>
+                    <td style="text-align:right">${Fmt.vnd(b.total)}</td>
+                    <td><span class="badge ${badgeCls(b.status)}">${b.status}</span></td>
+                  </tr>
+                `).join('') : '<tr><td colspan="5" class="tbl-empty">Chưa có booking</td></tr>'}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+      const footer = `<button class="btn btn-secondary" id="cClose">Đóng</button>`;
+      const m = AdminUI.openModal({ title: 'Khách hàng — ' + c.name, body, footer });
+      m.root.querySelector('#cClose').addEventListener('click', m.close);
+    }
+
+    function badgeCls(s) {
+      return ({ confirmed: 'success', pending: 'warning', completed: 'info', cancelled: 'danger' })[s] || 'muted';
+    }
+
+    function exportCsv() {
+      const list = getFiltered();
+      const header = ['ID','Name','Email','Phone','Country','Bookings','TotalSpent','Joined'];
+      const rows = list.map((c) => [c.id, c.name, c.email, c.phone, c.country, c.bookings, c.totalSpent, c.joined]);
+      const csv = [header, ...rows].map((r) => r.map((v) => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'customers.csv'; a.click();
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</body>
+</html>

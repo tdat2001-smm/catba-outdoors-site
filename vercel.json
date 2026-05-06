@@ -1,6 +1,22 @@
 {
+  "framework": null,
+  "buildCommand": "",
+  "installCommand": "",
+  "outputDirectory": ".",
   "cleanUrls": true,
   "trailingSlash": false,
+  "rewrites": [
+    {
+      "source": "/",
+      "has": [{ "type": "host", "value": "admin.catbaoutdoors.vn" }],
+      "destination": "/admin/index.html"
+    },
+    {
+      "source": "/:path((?!admin/).*)",
+      "has": [{ "type": "host", "value": "admin.catbaoutdoors.vn" }],
+      "destination": "/admin/:path"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",

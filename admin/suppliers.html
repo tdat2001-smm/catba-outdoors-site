@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Công nợ NCC — Catba PMS</title>
+  <link rel="stylesheet" href="css/admin.css">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌊</text></svg>">
+</head>
+<body>
+  <div id="app-root"></div>
+  <script src="js/auth.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/layout.js"></script>
+  <script>
+    const session = AdminUI.renderLayout({
+      active: 'suppliers',
+      title: 'Công nợ nhà cung cấp',
+      breadcrumb: 'Catba PMS / Tài chính / Công nợ NCC',
+      content: `
+        <div class="stat-grid" id="sStats"></div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-head">
+              <h3>Hoá đơn / Công nợ</h3>
+              <div style="display:flex; gap:.4rem">
+                <select id="statusFilter">
+                  <option value="">Tất cả</option>
+                  <option value="open">Đang nợ</option>
+                  <option value="overdue">Quá hạn</option>
+                  <option value="paid">Đã thanh toán</option>
+                </select>
+                <button class="btn btn-accent btn-sm" id="addInvoice">+ Hoá đơn</button>
+              </div>
+            </div>
+            <div class="card-body no-pad">
+              <div class="tbl-wrap">
+                <table class="tbl">
+                  <thead>
+                    <tr>
+                      <th>Mã HĐ</th><th>Nhà cung cấp</th><th>Ghi chú</th>
+                      <th>Phát hành</th><th>Đến hạn</th>
+                      <th style="text-align:right">Số tiền</th>
+                      <th style="text-align:right">Đã trả</th>
+                      <th>Trạng thái</th><th class="col-actions"></th>
+                    </tr>
+                  </thead>
+                  <tbody id="invBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head">
+              <h3>Nhà cung cấp</h3>
+              <button class="btn btn-accent btn-sm" id="addSupplier">+ NCC</button>
+            </div>
+            <div class="card-body no-pad">
+              <div class="tbl-wrap">
+                <table class="tbl">
+                  <thead><tr><th>Mã</th><th>Tên</th><th>Loại</th><th>Liên hệ</th><th class="col-actions"></th></tr></thead>
+                  <tbody id="suppBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      `
+    });
+
+    if (session) {
+      document.getElementById('statusFilter').addEventListener('change', renderInvoices);
+      document.getElementById('addInvoice').addEventListener('click', () => editInvoice(null));
+      document.getElementById('addSupplier').addEventListener('click', () => editSupplier(null));
+      renderAll();
+    }
+
+    function renderAll() { renderStats(); renderInvoices(); renderSuppliers(); }
+
+    function renderStats() {
+      const all = Store.payables.all();
+      const totalDebt = all.reduce((s,p) => s + (p.amount - p.paid), 0);
+      const overdue = all.filter((p) => p.status === 'overdue').reduce((s,p) => s + (p.amount - p.paid), 0);
+      const open = all.filter((p) => p.status === 'open').reduce((s,p) => s + (p.amount - p.paid), 0);
+      const paid = all.reduce((s,p) => s + p.paid, 0);
+      const stats = [
+        { label: 'Tổng phải trả', value: Fmt.vnd(totalDebt), cls: 'danger', icon: '💸' },
+        { label: 'Quá hạn', value: Fmt.vnd(overdue), cls: 'danger', icon: '⚠️' },
+        { label: 'Đang nợ (chưa hạn)', value: Fmt.vnd(open), cls: '', icon: '📌' },
+        { label: 'Đã thanh toán', value: Fmt.vnd(paid), cls: 'success', icon: '✅' }
+      ];
+      document.getElementById('sStats').innerHTML = stats.map((s) => `
+        <div class="stat ${s.cls}">
+          <div class="meta"><div class="label">${s.label}</div><div class="value">${s.value}</div></div>
+          <div class="icon"><span style="font-size:22px">${s.icon}</span></div>
+        </div>
+      `).join('');
+    }
+
+    function renderInvoices() {
+      const filter = document.getElementById('statusFilter').value;
+      const list = Store.payables.all().filter((p) => !filter || p.status === filter);
+      const body = document.getElementById('invBody');
+      if (!list.length) { body.innerHTML = '<tr><td colspan="9" class="tbl-empty">Không có hoá đơn</td></tr>'; return; }
+      body.innerHTML = list.map((p) => `
+        <tr>
+          <td><strong>${p.id}</strong></td>
+          <td>${AdminUI.escapeHtml(p.supplierName)}</td>
+          <td style="color:var(--c-muted);font-size:.82rem">${AdminUI.escapeHtml(p.note || '')}</td>
+          <td>${Fmt.date(p.issued)}</td>
+          <td>${Fmt.date(p.due)}</td>
+          <td style="text-align:right;font-weight:600">${Fmt.vnd(p.amount)}</td>
+          <td style="text-align:right">${Fmt.vnd(p.paid)}</td>
+          <td>${invBadge(p)}</td>
+          <td class="col-actions">
+            <button class="btn btn-secondary btn-sm" data-edit="${p.id}">Sửa</button>
+            <button class="btn btn-danger btn-sm" data-del="${p.id}">Xoá</button>
+          </td>
+        </tr>
+      `).join('');
+      body.querySelectorAll('button[data-edit]').forEach((b) => b.addEventListener('click', () => editInvoice(b.dataset.edit)));
+      body.querySelectorAll('button[data-del]').forEach((b) => b.addEventListener('click', () => {
+        if (!confirm('Xoá hoá đơn ' + b.dataset.del + '?')) return;
+        Store.payables.remove(b.dataset.del); AdminUI.toast('Đã xoá', 'success'); renderAll();
+      }));
+    }
+
+    function renderSuppliers() {
+      const list = Store.suppliers.all();
+      const body = document.getElementById('suppBody');
+      body.innerHTML = list.map((s) => `
+        <tr>
+          <td><strong>${s.id}</strong></td>
+          <td>
+            <div style="font-weight:600">${AdminUI.escapeHtml(s.name)}</div>
+            <div style="color:var(--c-muted);font-size:.78rem">Hạn: ${s.terms}</div>
+          </td>
+          <td>${AdminUI.escapeHtml(s.category)}</td>
+          <td>
+            <div style="font-size:.82rem">${AdminUI.escapeHtml(s.contact)}</div>
+            <div style="color:var(--c-muted);font-size:.78rem">${AdminUI.escapeHtml(s.phone)}</div>
+          </td>
+          <td class="col-actions">
+            <button class="btn btn-secondary btn-sm" data-edit="${s.id}">Sửa</button>
+            <button class="btn btn-danger btn-sm" data-del="${s.id}">Xoá</button>
+          </td>
+        </tr>
+      `).join('') || '<tr><td colspan="5" class="tbl-empty">Chưa có NCC</td></tr>';
+      body.querySelectorAll('button[data-edit]').forEach((b) => b.addEventListener('click', () => editSupplier(b.dataset.edit)));
+      body.querySelectorAll('button[data-del]').forEach((b) => b.addEventListener('click', () => {
+        if (!confirm('Xoá nhà cung cấp ' + b.dataset.del + '?')) return;
+        Store.suppliers.remove(b.dataset.del); AdminUI.toast('Đã xoá', 'success'); renderAll();
+      }));
+    }
+
+    function invBadge(p) {
+      const d = p.amount - p.paid;
+      if (d <= 0) return '<span class="badge success">Đã thanh toán</span>';
+      if (p.status === 'overdue') return '<span class="badge danger">Quá hạn</span>';
+      return '<span class="badge warning">Đang nợ</span>';
+    }
+
+    function editInvoice(id) {
+      const all = Store.payables.all();
+      const p = id ? all.find((x) => x.id === id) : { id: 'INV-' + Math.floor(Math.random()*9000 + 6000), supplierId: '', supplierName: '', issued: new Date().toISOString().slice(0,10), due: '', amount: 0, paid: 0, status: 'open', note: '' };
+      const suppliers = Store.suppliers.all();
+      const body = `
+        <div class="form-grid">
+          <div class="form-row"><label>Mã HĐ</label><input id="iId" value="${p.id}" ${id ? 'readonly' : ''}></div>
+          <div class="form-row"><label>Nhà cung cấp</label>
+            <select id="iSupp">
+              ${suppliers.map((s) => `<option value="${s.id}" ${s.id === p.supplierId ? 'selected' : ''}>${AdminUI.escapeHtml(s.name)}</option>`).join('')}
+            </select>
+          </div>
+          <div class="form-row"><label>Ngày phát hành</label><input id="iIssued" type="date" value="${p.issued}"></div>
+          <div class="form-row"><label>Đến hạn</label><input id="iDue" type="date" value="${p.due}"></div>
+          <div class="form-row"><label>Số tiền (VND)</label><input id="iAmount" type="number" value="${p.amount}"></div>
+          <div class="form-row"><label>Đã trả (VND)</label><input id="iPaid" type="number" value="${p.paid}"></div>
+          <div class="form-row full"><label>Ghi chú</label><textarea id="iNote">${AdminUI.escapeHtml(p.note)}</textarea></div>
+        </div>
+      `;
+      const footer = `<button class="btn btn-secondary" id="iCancel">Huỷ</button><button class="btn btn-accent" id="iSave">Lưu</button>`;
+      const m = AdminUI.openModal({ title: id ? 'Sửa hoá đơn' : 'Thêm hoá đơn', body, footer });
+      m.root.querySelector('#iCancel').addEventListener('click', m.close);
+      m.root.querySelector('#iSave').addEventListener('click', () => {
+        const supp = suppliers.find((s) => s.id === m.root.querySelector('#iSupp').value);
+        const today = new Date().toISOString().slice(0,10);
+        const data = {
+          id: m.root.querySelector('#iId').value,
+          supplierId: supp ? supp.id : '',
+          supplierName: supp ? supp.name : '',
+          issued: m.root.querySelector('#iIssued').value,
+          due: m.root.querySelector('#iDue').value,
+          amount: Number(m.root.querySelector('#iAmount').value) || 0,
+          paid: Number(m.root.querySelector('#iPaid').value) || 0,
+          note: m.root.querySelector('#iNote').value
+        };
+        data.status = data.paid >= data.amount ? 'paid' : (data.due && data.due < today ? 'overdue' : 'open');
+        if (id) Store.payables.update(id, data); else Store.payables.add(data);
+        AdminUI.toast('Đã lưu hoá đơn', 'success');
+        m.close(); renderAll();
+      });
+    }
+
+    function editSupplier(id) {
+      const all = Store.suppliers.all();
+      const s = id ? all.find((x) => x.id === id) : { id: 'S' + String(Math.floor(Math.random()*99 + 10)).padStart(2,'0'), name: '', category: '', contact: '', phone: '', email: '', terms: 'Net 30' };
+      const body = `
+        <div class="form-grid">
+          <div class="form-row"><label>Mã NCC</label><input id="sId" value="${s.id}" ${id ? 'readonly' : ''}></div>
+          <div class="form-row"><label>Loại</label><input id="sCat" value="${AdminUI.escapeHtml(s.category)}"></div>
+          <div class="form-row full"><label>Tên nhà cung cấp</label><input id="sName" value="${AdminUI.escapeHtml(s.name)}"></div>
+          <div class="form-row"><label>Người liên hệ</label><input id="sContact" value="${AdminUI.escapeHtml(s.contact)}"></div>
+          <div class="form-row"><label>Điện thoại</label><input id="sPhone" value="${AdminUI.escapeHtml(s.phone)}"></div>
+          <div class="form-row"><label>Email</label><input id="sEmail" value="${AdminUI.escapeHtml(s.email)}"></div>
+          <div class="form-row"><label>Hạn thanh toán</label>
+            <select id="sTerms">
+              ${['Net 7','Net 15','Net 30','Net 45','Net 60','COD'].map((t) => `<option ${t === s.terms ? 'selected' : ''}>${t}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+      `;
+      const footer = `<button class="btn btn-secondary" id="sCancel">Huỷ</button><button class="btn btn-accent" id="sSave">Lưu</button>`;
+      const m = AdminUI.openModal({ title: id ? 'Sửa nhà cung cấp' : 'Thêm nhà cung cấp', body, footer });
+      m.root.querySelector('#sCancel').addEventListener('click', m.close);
+      m.root.querySelector('#sSave').addEventListener('click', () => {
+        const data = {
+          id: m.root.querySelector('#sId').value,
+          name: m.root.querySelector('#sName').value,
+          category: m.root.querySelector('#sCat').value,
+          contact: m.root.querySelector('#sContact').value,
+          phone: m.root.querySelector('#sPhone').value,
+          email: m.root.querySelector('#sEmail').value,
+          terms: m.root.querySelector('#sTerms').value
+        };
+        if (id) Store.suppliers.update(id, data); else Store.suppliers.add(data);
+        AdminUI.toast('Đã lưu NCC', 'success');
+        m.close(); renderAll();
+      });
+    }
+  </script>
+</body>
+</html>

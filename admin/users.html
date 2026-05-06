@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Người dùng — Catba PMS</title>
+  <link rel="stylesheet" href="css/admin.css">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌊</text></svg>">
+</head>
+<body>
+  <div id="app-root"></div>
+  <script src="js/auth.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/layout.js"></script>
+  <script>
+    const session = AdminUI.renderLayout({
+      active: 'users',
+      title: 'Người dùng',
+      breadcrumb: 'Catba PMS / Hệ thống / Người dùng',
+      content: `
+        <div class="card">
+          <div class="card-head">
+            <h3>Tài khoản truy cập admin</h3>
+            <button class="btn btn-accent btn-sm" id="addBtn">+ Thêm người dùng</button>
+          </div>
+          <div class="card-body">
+            <div class="filter-bar">
+              <input id="search" class="search" placeholder="Tìm theo tên, username, email...">
+              <select id="roleFilter">
+                <option value="">Tất cả vai trò</option>
+                <option value="owner">Owner</option>
+                <option value="manager">Manager</option>
+                <option value="staff">Staff</option>
+              </select>
+              <select id="statusFilter">
+                <option value="">Tất cả</option>
+                <option value="active">Đang hoạt động</option>
+                <option value="disabled">Đã khoá</option>
+              </select>
+            </div>
+            <div class="tbl-wrap">
+              <table class="tbl">
+                <thead>
+                  <tr>
+                    <th>Người dùng</th>
+                    <th>Email</th>
+                    <th>Vai trò</th>
+                    <th>Trạng thái</th>
+                    <th>Tạo</th>
+                    <th>Đăng nhập gần nhất</th>
+                    <th class="col-actions"></th>
+                  </tr>
+                </thead>
+                <tbody id="uBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      `
+    });
+
+    if (session) init();
+
+    function init() {
+      ['search','roleFilter','statusFilter'].forEach((id) => document.getElementById(id).addEventListener('input', render));
+      document.getElementById('addBtn').addEventListener('click', () => editUser(null));
+      render();
+    }
+
+    function render() {
+      const q = document.getElementById('search').value.trim().toLowerCase();
+      const role = document.getElementById('roleFilter').value;
+      const status = document.getElementById('statusFilter').value;
+      const all = Auth.listUsers();
+      const list = all.filter((u) => {
+        if (role && u.role !== role) return false;
+        if (status && (u.status || 'active') !== status) return false;
+        if (q && !((u.name||'').toLowerCase().includes(q) || (u.username||'').toLowerCase().includes(q) || (u.email||'').toLowerCase().includes(q))) return false;
+        return true;
+      });
+
+      const body = document.getElementById('uBody');
+      if (!list.length) { body.innerHTML = '<tr><td colspan="7" class="tbl-empty">Không có user phù hợp</td></tr>'; return; }
+      body.innerHTML = list.map((u) => {
+        const role = (Auth.ROLES[u.role] || {}).label || u.role;
+        const isMe = u.id === session.id;
+        return `
+          <tr>
+            <td>
+              <div style="display:flex;align-items:center;gap:.6rem">
+                <div style="width:36px;height:36px;border-radius:50%;background:#fef3c7;color:#92400e;display:grid;place-items:center;font-weight:700;font-size:.8rem">
+                  ${u.name.split(' ').slice(-2).map((p) => p[0]).join('').toUpperCase()}
+                </div>
+                <div>
+                  <div style="font-weight:600">${AdminUI.escapeHtml(u.name)} ${isMe ? '<span class="badge muted" style="margin-left:.4rem">bạn</span>' : ''}</div>
+                  <div style="color:var(--c-muted);font-size:.78rem">@${AdminUI.escapeHtml(u.username)}</div>
+                </div>
+              </div>
+            </td>
+            <td>${AdminUI.escapeHtml(u.email || '—')}</td>
+            <td>${roleBadge(u.role)}</td>
+            <td>${(u.status || 'active') === 'active' ? '<span class="badge success">Hoạt động</span>' : '<span class="badge danger">Đã khoá</span>'}</td>
+            <td>${Fmt.date(u.createdAt)}</td>
+            <td>${u.lastLogin ? Fmt.date(u.lastLogin) : '<span style="color:var(--c-muted)">Chưa đăng nhập</span>'}</td>
+            <td class="col-actions">
+              <button class="btn btn-secondary btn-sm" data-edit="${u.id}">Sửa</button>
+              ${isMe ? '' : '<button class="btn btn-danger btn-sm" data-del="' + u.id + '">Xoá</button>'}
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      body.querySelectorAll('button[data-edit]').forEach((b) => b.addEventListener('click', () => editUser(b.dataset.edit)));
+      body.querySelectorAll('button[data-del]').forEach((b) => b.addEventListener('click', async () => {
+        if (!confirm('Xoá người dùng này?')) return;
+        const r = Auth.removeUser(b.dataset.del);
+        if (!r.ok) AdminUI.toast(r.error, 'error');
+        else { AdminUI.toast('Đã xoá', 'success'); render(); }
+      }));
+    }
+
+    function roleBadge(r) {
+      const cls = r === 'owner' ? 'danger' : r === 'manager' ? 'info' : 'muted';
+      return `<span class="badge ${cls}">${(Auth.ROLES[r] || {}).label || r}</span>`;
+    }
+
+    function editUser(id) {
+      const u = id ? Auth.listUsers().find((x) => x.id === id) : { id: null, username: '', name: '', role: 'staff', email: '', status: 'active' };
+      const isNew = !id;
+      const body = `
+        <div class="form-grid">
+          <div class="form-row"><label>Tên đăng nhập</label><input id="uUsername" value="${AdminUI.escapeHtml(u.username)}" ${isNew ? '' : 'disabled'}></div>
+          <div class="form-row"><label>Họ tên</label><input id="uName" value="${AdminUI.escapeHtml(u.name)}"></div>
+          <div class="form-row"><label>Email</label><input id="uEmail" type="email" value="${AdminUI.escapeHtml(u.email)}"></div>
+          <div class="form-row"><label>Vai trò</label>
+            <select id="uRole">
+              <option value="owner"   ${u.role==='owner'?'selected':''}>Owner — toàn quyền</option>
+              <option value="manager" ${u.role==='manager'?'selected':''}>Manager — vận hành & tài chính</option>
+              <option value="staff"   ${u.role==='staff'?'selected':''}>Staff — vận hành & nội dung</option>
+            </select>
+          </div>
+          <div class="form-row"><label>Trạng thái</label>
+            <select id="uStatus">
+              <option value="active" ${(u.status||'active')==='active'?'selected':''}>Hoạt động</option>
+              <option value="disabled" ${u.status==='disabled'?'selected':''}>Đã khoá</option>
+            </select>
+          </div>
+          <div class="form-row full"><label>${isNew ? 'Mật khẩu' : 'Đặt lại mật khẩu (để trống nếu không đổi)'}</label><input id="uPassword" type="password" placeholder="${isNew ? '≥ 6 ký tự' : ''}"></div>
+        </div>
+        <p style="font-size:.78rem;color:var(--c-muted);margin-top:.75rem">Owner có toàn quyền (kể cả quản lý người dùng & backend). Manager truy cập tài chính + vận hành. Staff chỉ thấy vận hành + nội dung.</p>
+      `;
+      const footer = `<button class="btn btn-secondary" id="uCancel">Huỷ</button><button class="btn btn-accent" id="uSave">Lưu</button>`;
+      const m = AdminUI.openModal({ title: isNew ? 'Thêm người dùng' : 'Sửa người dùng', body, footer });
+      m.root.querySelector('#uCancel').addEventListener('click', m.close);
+      m.root.querySelector('#uSave').addEventListener('click', async () => {
+        const data = {
+          username: m.root.querySelector('#uUsername').value.trim(),
+          name: m.root.querySelector('#uName').value.trim(),
+          email: m.root.querySelector('#uEmail').value.trim(),
+          role: m.root.querySelector('#uRole').value,
+          status: m.root.querySelector('#uStatus').value,
+          password: m.root.querySelector('#uPassword').value
+        };
+        if (isNew) {
+          if (!data.username) { AdminUI.toast('Cần tên đăng nhập', 'error'); return; }
+          if (!data.password) { AdminUI.toast('Cần mật khẩu', 'error'); return; }
+          const r = await Auth.createUser(data);
+          if (!r.ok) { AdminUI.toast(r.error, 'error'); return; }
+        } else {
+          const r = await Auth.updateUser(id, data);
+          if (!r.ok) { AdminUI.toast(r.error, 'error'); return; }
+        }
+        AdminUI.toast('Đã lưu người dùng', 'success');
+        m.close();
+        render();
+      });
+    }
+  </script>
+</body>
+</html>
