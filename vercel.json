@@ -7,14 +7,9 @@
   "trailingSlash": false,
   "rewrites": [
     {
-      "source": "/",
+      "source": "/:path*",
       "has": [{ "type": "host", "value": "admin.catbaoutdoors.vn" }],
-      "destination": "/admin/index.html"
-    },
-    {
-      "source": "/:path((?!admin/).*)",
-      "has": [{ "type": "host", "value": "admin.catbaoutdoors.vn" }],
-      "destination": "/admin/:path"
+      "destination": "/admin/:path*"
     }
   ],
   "headers": [
