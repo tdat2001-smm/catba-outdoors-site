@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cài đặt — Catba PMS</title>
+  <link rel="stylesheet" href="css/admin.css">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌊</text></svg>">
+  <style>
+    .settings-tabs { display:flex; gap:.25rem; border-bottom:1px solid var(--c-border); margin-bottom:1.25rem; }
+    .settings-tab { padding:.75rem 1rem; font-weight:600; color:var(--c-muted); border-bottom:2px solid transparent; cursor:pointer; font-size:.88rem; }
+    .settings-tab.active { color:var(--c-text); border-color:var(--c-accent); }
+    .settings-pane { display:none; }
+    .settings-pane.active { display:block; }
+    .field-help { font-size:.78rem; color:var(--c-muted); margin-top:.25rem; }
+    .pill { display:inline-block; padding:.18rem .55rem; border-radius:12px; font-size:.72rem; font-weight:600; background:#fee2e2; color:#991b1b; }
+    .pill.on { background:#d1fae5; color:#065f46; }
+    .code-block { background:#1a1a1a; color:#e5e7eb; padding:1rem; border-radius:8px; font-family:Menlo,Consolas,monospace; font-size:.78rem; overflow-x:auto; white-space:pre; line-height:1.5; }
+  </style>
+</head>
+<body>
+  <div id="app-root"></div>
+  <script src="js/auth.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/backend.js"></script>
+  <script src="js/layout.js"></script>
+  <script>
+    const session = AdminUI.renderLayout({
+      active: 'settings',
+      title: 'Cài đặt',
+      breadcrumb: 'Catba PMS / Hệ thống / Cài đặt',
+      content: `
+        <div class="settings-tabs">
+          <div class="settings-tab active" data-pane="profile">Hồ sơ</div>
+          <div class="settings-tab" data-pane="password">Đổi mật khẩu</div>
+          <div class="settings-tab" data-pane="backend">Backend (Supabase)</div>
+          <div class="settings-tab" data-pane="data">Dữ liệu</div>
+        </div>
+
+        <div class="settings-pane active" data-pane="profile">
+          <div class="card">
+            <div class="card-head"><h3>Thông tin tài khoản</h3></div>
+            <div class="card-body">
+              <div class="form-grid">
+                <div class="form-row"><label>Tên đăng nhập</label><input id="pUsername" disabled></div>
+                <div class="form-row"><label>Vai trò</label><input id="pRole" disabled></div>
+                <div class="form-row"><label>Họ tên</label><input id="pName"></div>
+                <div class="form-row"><label>Email</label><input id="pEmail" type="email"></div>
+              </div>
+              <div style="margin-top:1rem"><button class="btn btn-accent" id="pSave">Lưu hồ sơ</button></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-pane" data-pane="password">
+          <div class="card">
+            <div class="card-head"><h3>Đổi mật khẩu</h3></div>
+            <div class="card-body" style="max-width:480px">
+              <div class="form-row"><label>Mật khẩu hiện tại</label><input id="cwCurrent" type="password" autocomplete="current-password"></div>
+              <div class="form-row"><label>Mật khẩu mới (≥ 6 ký tự)</label><input id="cwNew" type="password" autocomplete="new-password"></div>
+              <div class="form-row"><label>Xác nhận mật khẩu mới</label><input id="cwNew2" type="password" autocomplete="new-password"></div>
+              <button class="btn btn-accent" id="cwSave">Cập nhật mật khẩu</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-pane" data-pane="backend">
+          <div class="card">
+            <div class="card-head">
+              <h3>Kết nối Supabase</h3>
+              <span class="pill" id="bkPill">Chưa kết nối</span>
+            </div>
+            <div class="card-body" style="max-width:680px">
+              <p style="color:var(--c-muted);margin-bottom:1rem">Kết nối backend để dữ liệu đồng bộ giữa các thiết bị. Tạo project miễn phí tại <a href="https://supabase.com" target="_blank" style="color:var(--c-info)">supabase.com</a>, chạy schema bên dưới rồi nhập URL + anon key.</p>
+              <div class="form-row"><label>Supabase URL</label><input id="bkUrl" placeholder="https://xxxxx.supabase.co"></div>
+              <div class="form-row"><label>Anon (public) key</label><input id="bkKey" placeholder="eyJhbGci..."></div>
+              <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem">
+                <button class="btn btn-secondary" id="bkTest">Kiểm tra kết nối</button>
+                <button class="btn btn-accent" id="bkSave">Lưu cấu hình</button>
+                <button class="btn btn-danger" id="bkClear" style="margin-left:auto">Ngắt kết nối</button>
+              </div>
+              <div style="border-top:1px solid var(--c-border);padding-top:1rem;margin-top:1rem">
+                <h4 style="font-size:.95rem;font-weight:600;margin-bottom:.5rem">Đồng bộ dữ liệu</h4>
+                <p style="color:var(--c-muted);font-size:.85rem;margin-bottom:.75rem">"Push" gửi dữ liệu local lên cloud. "Pull" tải về local từ cloud (ghi đè).</p>
+                <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+                  <button class="btn btn-secondary" id="bkPush">⬆ Push lên cloud</button>
+                  <button class="btn btn-secondary" id="bkPull">⬇ Pull từ cloud</button>
+                </div>
+                <div id="bkSummary" style="margin-top:.75rem;font-size:.82rem;color:var(--c-muted)"></div>
+              </div>
+              <div style="margin-top:1.25rem">
+                <h4 style="font-size:.95rem;font-weight:600;margin-bottom:.5rem">SQL schema</h4>
+                <p style="color:var(--c-muted);font-size:.85rem;margin-bottom:.5rem">Mở Supabase project → SQL Editor → dán đoạn dưới đây và Run:</p>
+                <div class="code-block" id="schemaSql"></div>
+                <button class="btn btn-secondary btn-sm" id="copySql" style="margin-top:.5rem">Copy SQL</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-pane" data-pane="data">
+          <div class="card">
+            <div class="card-head"><h3>Quản lý dữ liệu local</h3></div>
+            <div class="card-body" style="max-width:680px">
+              <p style="color:var(--c-muted);margin-bottom:1rem">Xuất/nhập dữ liệu admin (booking, khách, công nợ, blog, tour, stay) ở dạng JSON. Hữu ích để backup hoặc di chuyển giữa máy.</p>
+              <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+                <button class="btn btn-secondary" id="exportData">⬇ Tải xuống JSON backup</button>
+                <label class="btn btn-secondary" for="importFile">⬆ Nạp từ JSON backup</label>
+                <input id="importFile" type="file" accept="application/json" style="display:none">
+                <button class="btn btn-danger" id="resetData" style="margin-left:auto">Reset về dữ liệu mẫu</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `
+    });
+
+    if (session) init();
+
+    function init() {
+      // Tab switching
+      document.querySelectorAll('.settings-tab').forEach((t) => t.addEventListener('click', () => {
+        document.querySelectorAll('.settings-tab').forEach((x) => x.classList.remove('active'));
+        document.querySelectorAll('.settings-pane').forEach((x) => x.classList.remove('active'));
+        t.classList.add('active');
+        document.querySelector('.settings-pane[data-pane="'+t.dataset.pane+'"]').classList.add('active');
+      }));
+
+      // Profile
+      document.getElementById('pUsername').value = session.username;
+      document.getElementById('pRole').value = (Auth.ROLES[session.role] || {}).label || session.role;
+      document.getElementById('pName').value = session.name;
+      document.getElementById('pEmail').value = session.email || '';
+      document.getElementById('pSave').addEventListener('click', async () => {
+        const r = await Auth.updateProfile(session.id, {
+          name: document.getElementById('pName').value.trim(),
+          email: document.getElementById('pEmail').value.trim()
+        });
+        if (!r.ok) AdminUI.toast(r.error, 'error');
+        else AdminUI.toast('Đã lưu hồ sơ. Tải lại để cập nhật.', 'success');
+      });
+
+      // Change password
+      document.getElementById('cwSave').addEventListener('click', async () => {
+        const cur = document.getElementById('cwCurrent').value;
+        const n1 = document.getElementById('cwNew').value;
+        const n2 = document.getElementById('cwNew2').value;
+        if (n1 !== n2) { AdminUI.toast('Mật khẩu mới không khớp', 'error'); return; }
+        const r = await Auth.changePassword(session.id, cur, n1);
+        if (!r.ok) AdminUI.toast(r.error, 'error');
+        else {
+          AdminUI.toast('Đã đổi mật khẩu', 'success');
+          document.getElementById('cwCurrent').value = '';
+          document.getElementById('cwNew').value = '';
+          document.getElementById('cwNew2').value = '';
+        }
+      });
+
+      // Backend
+      const isOwner = Auth.can('manageBackend');
+      const cfg = Backend.getConfig() || {};
+      document.getElementById('bkUrl').value = cfg.url || '';
+      document.getElementById('bkKey').value = cfg.anonKey || '';
+      updateBkPill();
+
+      if (!isOwner) {
+        ['bkUrl','bkKey','bkTest','bkSave','bkClear','bkPush','bkPull'].forEach((id) => document.getElementById(id).disabled = true);
+        document.getElementById('bkSummary').innerHTML = '<span style="color:var(--c-danger)">Chỉ Owner mới được cấu hình backend.</span>';
+      } else {
+        document.getElementById('bkTest').addEventListener('click', async () => {
+          const r = await Backend.ping(document.getElementById('bkUrl').value.trim(), document.getElementById('bkKey').value.trim());
+          AdminUI.toast(r.ok ? 'Kết nối OK' : 'Lỗi: ' + r.error, r.ok ? 'success' : 'error');
+        });
+        document.getElementById('bkSave').addEventListener('click', () => {
+          const url = document.getElementById('bkUrl').value.trim();
+          const key = document.getElementById('bkKey').value.trim();
+          if (!url || !key) { AdminUI.toast('Cần đủ URL và key', 'error'); return; }
+          Backend.setConfig({ url, anonKey: key });
+          AdminUI.toast('Đã lưu cấu hình', 'success');
+          updateBkPill();
+        });
+        document.getElementById('bkClear').addEventListener('click', () => {
+          if (!confirm('Ngắt kết nối Supabase? Dữ liệu local vẫn được giữ.')) return;
+          Backend.setConfig(null);
+          AdminUI.toast('Đã ngắt kết nối', 'success');
+          updateBkPill();
+        });
+        document.getElementById('bkPush').addEventListener('click', async () => {
+          if (!Backend.isConnected()) { AdminUI.toast('Chưa kết nối', 'error'); return; }
+          if (!confirm('Push dữ liệu local lên Supabase?')) return;
+          AdminUI.toast('Đang push...', '');
+          const r = await Backend.pushAll();
+          if (r.ok) {
+            AdminUI.toast('Đã push xong', 'success');
+            document.getElementById('bkSummary').textContent = 'Push xong: ' + Object.entries(r.summary).map(([k,v]) => k+'('+v+')').join(', ');
+          } else {
+            AdminUI.toast(r.error, 'error');
+          }
+        });
+        document.getElementById('bkPull').addEventListener('click', async () => {
+          if (!Backend.isConnected()) { AdminUI.toast('Chưa kết nối', 'error'); return; }
+          if (!confirm('Pull sẽ ghi đè dữ liệu local. Tiếp tục?')) return;
+          AdminUI.toast('Đang pull...', '');
+          const r = await Backend.pullAll();
+          if (r.ok) {
+            AdminUI.toast('Đã pull xong. Tải lại trang để thấy.', 'success');
+            document.getElementById('bkSummary').textContent = 'Pull xong: ' + Object.entries(r.summary).map(([k,v]) => k+'('+v+')').join(', ');
+          } else {
+            AdminUI.toast(r.error, 'error');
+          }
+        });
+      }
+
+      document.getElementById('schemaSql').textContent = SCHEMA_SQL;
+      document.getElementById('copySql').addEventListener('click', () => {
+        navigator.clipboard.writeText(SCHEMA_SQL).then(() => AdminUI.toast('Đã copy SQL', 'success'));
+      });
+
+      // Data tab
+      document.getElementById('exportData').addEventListener('click', exportData);
+      document.getElementById('importFile').addEventListener('change', importData);
+      document.getElementById('resetData').addEventListener('click', () => {
+        if (!confirm('Reset toàn bộ dữ liệu admin về dữ liệu mẫu? Không thể hoàn tác.')) return;
+        Store.reset();
+        AdminUI.toast('Đã reset dữ liệu', 'success');
+      });
+    }
+
+    function updateBkPill() {
+      const el = document.getElementById('bkPill');
+      if (Backend.isConnected()) { el.textContent = 'Đã kết nối'; el.classList.add('on'); }
+      else { el.textContent = 'Chưa kết nối'; el.classList.remove('on'); }
+    }
+
+    function exportData() {
+      const data = {};
+      Backend.TABLES.forEach((t) => {
+        const raw = localStorage.getItem('cbo_admin_' + t);
+        if (raw) data[t] = JSON.parse(raw);
+      });
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'catba-pms-' + new Date().toISOString().slice(0,10) + '.json'; a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function importData(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      if (!confirm('Nạp file này sẽ ghi đè dữ liệu hiện tại. Tiếp tục?')) { e.target.value = ''; return; }
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const data = JSON.parse(reader.result);
+          Backend.TABLES.forEach((t) => {
+            if (Array.isArray(data[t])) localStorage.setItem('cbo_admin_' + t, JSON.stringify(data[t]));
+          });
+          AdminUI.toast('Đã nạp dữ liệu. Tải lại để thấy.', 'success');
+        } catch (err) {
+          AdminUI.toast('File JSON không hợp lệ', 'error');
+        }
+      };
+      reader.readAsText(file);
+      e.target.value = '';
+    }
+
+    const SCHEMA_SQL = `-- Catba Outdoors PMS — Supabase schema
+-- Chạy 1 lần trong SQL Editor. Tất cả bảng dùng id (text) làm primary key.
+create table if not exists tours      (id text primary key, data jsonb, title text, location text, "priceVND" bigint, price numeric, status text, featured boolean, category text);
+create table if not exists stays      (id text primary key, data jsonb, title text, location text, "priceFrom" bigint, status text);
+create table if not exists customers  (id text primary key, data jsonb, name text, email text, phone text, country text, bookings int, "totalSpent" bigint, joined date);
+create table if not exists suppliers  (id text primary key, data jsonb, name text, category text, contact text, phone text, email text, terms text);
+create table if not exists payables   (id text primary key, data jsonb, "supplierId" text, "supplierName" text, issued date, due date, amount bigint, paid bigint, status text, note text);
+create table if not exists bookings   (id text primary key, data jsonb, date date, "createdAt" timestamptz, type text, "productId" text, "productTitle" text, "customerId" text, "customerName" text, email text, phone text, guests int, total bigint, paid bigint, status text, channel text);
+create table if not exists blog       (id text primary key, data jsonb, title text, slug text, author text, category text, status text, published date, excerpt text, content text);
+
+-- RLS — bật & cho phép anon đọc/ghi (dành cho admin nhỏ).
+-- LƯU Ý BẢO MẬT: anon key public ai cũng có. Khi production, hãy đổi sang policy yêu cầu auth.uid().
+alter table tours      enable row level security;
+alter table stays      enable row level security;
+alter table customers  enable row level security;
+alter table suppliers  enable row level security;
+alter table payables   enable row level security;
+alter table bookings   enable row level security;
+alter table blog       enable row level security;
+
+do $$
+declare t text;
+begin
+  for t in select unnest(array['tours','stays','customers','suppliers','payables','bookings','blog']) loop
+    execute format('drop policy if exists "anon all" on %I', t);
+    execute format('create policy "anon all" on %I for all using (true) with check (true)', t);
+  end loop;
+end $$;`;
+  </script>
+</body>
+</html>
