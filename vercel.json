@@ -5,16 +5,12 @@
   "outputDirectory": ".",
   "cleanUrls": true,
   "trailingSlash": false,
-  "rewrites": [
+  "redirects": [
     {
       "source": "/",
       "has": [{ "type": "host", "value": "admin.catbaoutdoors.vn" }],
-      "destination": "/admin/index.html"
-    },
-    {
-      "source": "/:path+",
-      "has": [{ "type": "host", "value": "admin.catbaoutdoors.vn" }],
-      "destination": "/admin/:path+"
+      "destination": "/admin/",
+      "permanent": false
     }
   ],
   "headers": [
